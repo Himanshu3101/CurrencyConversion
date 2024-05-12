@@ -57,7 +57,7 @@ dependencies {
     val lifecycle_version = "2.7.0"
     val retrofit_version = "2.9.0"
     val coroutine_version = "1.7.3"
-    val roomVersion = "2.4.2"
+    val roomVersion = "2.6.1"
 
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.6.1")

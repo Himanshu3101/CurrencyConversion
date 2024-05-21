@@ -5,10 +5,12 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.example.currencyconversion.network.server.NetworkResult
 import com.example.currencyconversion.ViewModels.Data_VM
 import com.example.currencyconversion.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -22,55 +24,69 @@ class MainActivity : AppCompatActivity() {
         activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(activityMainBinding.root)
 
+        observeServerConversionData()
+        ObserveDBConversionData()
 
-        getDefaultConversionData()
-        observeConversionData()
+        activityMainBinding.clear.setOnClickListener {
+            activityMainBinding.textViewData.text = ""
+        }
 
+        activityMainBinding.getDBData.setOnClickListener {
+            viewModel.getDBConversionData()
+        }
 
+        activityMainBinding.getServerData.setOnClickListener {
+            viewModel.getServerExchangeData(BuildConfig.API_KEY)
 
+        }
+
+//For Checking the INSERTION in DB
+        /*viewModel.booleanValue.observe(this, Observer { value ->
+            // Handle the boolean value change
+            Toast.makeText(this, "Boolean value is: $value", Toast.LENGTH_SHORT).show()
+        })*/
     }
 
-    private fun observeConversionData() {
+    private fun ObserveDBConversionData() {
         try {
-            viewModel.response.observe(this, Observer { result ->
-                when(result){
-                    is NetworkResult.Loading -> {
-                        activityMainBinding.progress.visibility = View.VISIBLE
-                    }
-                    is NetworkResult.Success -> {
-                        activityMainBinding.progress.visibility = View.GONE
-                        activityMainBinding.textViewData.text = result._data?.rates.toString()
-                    }
-                    is NetworkResult.Error -> {
-                        activityMainBinding.progress.visibility = View.GONE
-                        activityMainBinding.textViewData.text = "Error: "   /*${result.message}*/
-                    }
+            lifecycleScope.launch {
+                viewModel.dBConversionData.collect { rates ->
+                    println("Collected rates: $rates")
+                    val ratesText = rates.joinToString("\n") { it.toString() }
+                    activityMainBinding.textViewData.text = ratesText
                 }
-            })
-            /*viewModel.response.observe(this) { response ->
-                val apiResultHandler = ApiResultHandler<ApiResponseData>(this@ProductListActivity,
-                    onLoading = {
-                        activityProductListBinding.progress.visibility = View.VISIBLE
-                    },
-                    onSuccess = { data ->
-                        activityProductListBinding.progress.visibility = View.GONE
-                        data?.Data?.marketList?.let { productListAdapter.setProducts(it) }
-                        activityProductListBinding.swipeRefreshLayout.isRefreshing = false
-                    },
-                    onFailure = {
-                        activityProductListBinding.progress.visibility = View.GONE
-                    })
-                apiResultHandler.handleApiResult(response)
-            }*/
+
+            }
         } catch (e: Exception) {
             e.stackTrace
         }
     }
 
-    private fun getDefaultConversionData() {
-        viewModel.getExchangeData(BuildConfig.API_KEY)
+    private fun observeServerConversionData() {
+        try {
+            viewModel.response.observe(this, Observer { result ->
+                when (result) {
+                    is NetworkResult.Loading -> {
+                        activityMainBinding.progress.visibility = View.VISIBLE
+                    }
+
+                    is NetworkResult.Success -> {
+                        activityMainBinding.progress.visibility = View.GONE
+                        activityMainBinding.textViewData.text = result._data?.rates?.toString()
+
+                        result._data?.let {
+                            viewModel.insertDBExchangeData(it.rates)
+                        }
+                    }
+
+                    is NetworkResult.Error -> {
+                        activityMainBinding.progress.visibility = View.GONE
+                        activityMainBinding.textViewData.text = "Error:${result.message}"
+                    }
+                }
+            })
+        } catch (e: Exception) {
+            e.stackTrace
+        }
     }
-
-
-
 }

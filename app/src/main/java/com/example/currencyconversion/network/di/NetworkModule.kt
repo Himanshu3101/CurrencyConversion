@@ -3,11 +3,10 @@ package com.example.currencyconversion.network.di
 import android.content.Context
 import androidx.room.Room
 import com.example.currencyconversion.Utils.Constants.Companion.base_url
-import com.example.currencyconversion.network.Database.CurrencyDB
+import com.example.currencyconversion.network.Database.CurrencyDataBase
 import com.example.currencyconversion.network.server.retrofit.API
 import com.example.currencyconversion.repository.LocalDataRepository
 import com.example.currencyconversion.repository.ROOMRepository
-import com.example.currencyconversion.repository.ServerRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,10 +24,10 @@ class NetworkModule {
 
     @Singleton
     @Provides
-    fun provideDatabase(@ApplicationContext context: Context): CurrencyDB {
+    fun provideDatabase(@ApplicationContext context: Context): CurrencyDataBase {
         return Room.databaseBuilder(context,
-            CurrencyDB::class.java,
-            "Currency_ConversionDB"
+            CurrencyDataBase::class.java,
+            "Currency_Conversiondb"
         ).build()
     }
 
@@ -43,8 +42,8 @@ class NetworkModule {
 
 
     @Provides
-    fun getSQLRepository(currencyDB: CurrencyDB): LocalDataRepository {
-        return ROOMRepository(currencyDB)
+    fun getSQLRepository(currencyDataBase: CurrencyDataBase): LocalDataRepository {
+        return ROOMRepository(currencyDataBase)
     }
 
 

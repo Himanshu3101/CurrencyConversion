@@ -1,10 +1,8 @@
 package com.example.currencyconversion.network.server.retrofit
 
-import android.telecom.Call
 import com.example.currencyconversion.data.models.ResponseExchangeList
 import retrofit2.Response
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.Query
 

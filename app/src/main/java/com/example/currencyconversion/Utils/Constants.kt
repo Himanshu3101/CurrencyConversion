@@ -10,8 +10,7 @@ class Constants {
 
         const val base_url ="https://openexchangerates.org/api/"
         const val API_INTERNET_MESSAGE="No Internet Connection"
-
-
+        const val TAG_DataFetchWorked = "DataFetchWorker"
         fun hasInternetConnection(context: Context?): Boolean {
             try {
                 if (context == null)

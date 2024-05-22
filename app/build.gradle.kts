@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.storage.CacheResetOnProcessCanceled.enabled
 import java.util.Properties
 
 plugins {
@@ -6,6 +5,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.dagger.hilt.android")
+    id ("dagger.hilt.android.plugin")
 }
 
 android {
@@ -53,7 +53,9 @@ android {
 dependencies {
 
     implementation("androidx.annotation:annotation:1.7.1")
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
     val hilt_version = "2.49"
+    val hilt_work = "1.2.0"
     val lifecycle_version = "2.7.0"
     val retrofit_version = "2.9.0"
     val coroutine_version = "1.7.3"
@@ -69,7 +71,13 @@ dependencies {
 
     // Hilt
     implementation("com.google.dagger:hilt-android:$hilt_version")
+    implementation ("androidx.hilt:hilt-work:$hilt_work")
     kapt("com.google.dagger:hilt-android-compiler:$hilt_version")
+    kapt ("androidx.hilt:hilt-compiler:$hilt_work")
+
+    kapt ("com.google.dagger:hilt-compiler:$hilt_version")
+    implementation ("androidx.work:work-runtime-ktx:2.9.0")
+
 
     //Lifecycle
 //    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version")

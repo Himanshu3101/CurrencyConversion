@@ -1,12 +1,11 @@
 package com.example.currencyconversion.repository
 
 import com.example.currencyconversion.BuildConfig
+import com.example.currencyconversion.Utils.Cache
 import com.example.currencyconversion.data.models.CachedData
 import com.example.currencyconversion.data.models.ResponseExchangeList
 import com.example.currencyconversion.network.server.NetworkResult
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import java.lang.reflect.Constructor
 
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -28,6 +27,6 @@ class DataRepository @Inject constructor (private val serverRepository: ServerRe
 
     private fun isDataExpired(data: CachedData, currentTime: Long): Boolean {
         val elapsedTime = currentTime - data.fetchTime
-        return elapsedTime >= TimeUnit.MINUTES.toMillis(2) // Check if 30 minutes have passed
+        return elapsedTime >= TimeUnit.MINUTES.toMillis(15) // Check if 30 minutes have passed
     }
 }

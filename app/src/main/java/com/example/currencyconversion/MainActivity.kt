@@ -3,6 +3,7 @@ package com.example.currencyconversion
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
@@ -10,13 +11,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.currencyconversion.Utils.Constants
 import com.example.currencyconversion.network.server.NetworkResult
 import com.example.currencyconversion.ViewModels.Data_VM
 import com.example.currencyconversion.databinding.ActivityMainBinding
-import com.example.currencyconversion.repository.DataFetchWorker
+import com.example.currencyconversion.workManager.DataFetchWorker
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -33,22 +35,25 @@ class MainActivity : AppCompatActivity() {
         activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(activityMainBinding.root)
 
-//        schedulePeriodicDataFetch(applicationContext)
-
         observeServerConversionData()
-        ObserveDBConversionData()
+
 
         activityMainBinding.clear.setOnClickListener {
             activityMainBinding.textViewData.text = ""
         }
 
+
+        //        ObserveDBConversionData()
         activityMainBinding.getDBData.setOnClickListener {
-            viewModel.getDBConversionData()
+//            For ROOM DB
+//            viewModel.getDBConversionData()
         }
+
+
 
         activityMainBinding.getServerData.setOnClickListener {
             viewModel.getServerExchangeData(BuildConfig.API_KEY)
-
+//            schedulePeriodicDataFetch()
         }
 
 //For Checking the INSERTION in DB
@@ -76,6 +81,7 @@ class MainActivity : AppCompatActivity() {
     private fun observeServerConversionData() {
         try {
             viewModel.response.observe(this, Observer { result ->
+
                 when (result) {
                     is NetworkResult.Loading -> {
                         activityMainBinding.progress.visibility = View.VISIBLE
@@ -85,9 +91,12 @@ class MainActivity : AppCompatActivity() {
                         activityMainBinding.progress.visibility = View.GONE
                         activityMainBinding.textViewData.text = result._data?.rates?.toString()
 
-                        result._data?.let {
+                        schedulePeriodicDataFetch()
+
+                        //For ROOM DB
+                       /* result._data?.let {
                             viewModel.insertDBExchangeData(it.rates)
-                        }
+                        }*/
                     }
 
                     is NetworkResult.Error -> {
@@ -98,27 +107,25 @@ class MainActivity : AppCompatActivity() {
             })
         } catch (e: Exception) {
             e.stackTrace
+            e.message?.let { Log.d("Server Observer", it) }
         }
     }
 
-    fun schedulePeriodicDataFetch(context: Context) {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
+    private fun schedulePeriodicDataFetch() {
+
+        /*val workRequest = OneTimeWorkRequestBuilder<DataFetchWorker>().build()
+        WorkManager.getInstance(applicationContext).enqueue(workRequest)
+*/
+
+        val constraint = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+        val workRequest = PeriodicWorkRequestBuilder<DataFetchWorker>(15, TimeUnit.MINUTES)
+            .setConstraints(constraint)
             .build()
 
-        val periodicWorkRequest = PeriodicWorkRequestBuilder<DataFetchWorker>(
-            repeatInterval = 30, // Repeat every 30 minutes
-            repeatIntervalTimeUnit = TimeUnit.MINUTES
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "DataFetchWork",
+            ExistingPeriodicWorkPolicy.KEEP,
+            workRequest
         )
-            .setConstraints(constraints)
-            .addTag(Constants.TAG_DataFetchWorked)
-            .build()
-
-        WorkManager.getInstance(context)
-            .enqueueUniquePeriodicWork(
-                "DataFetchPeriodicWork",
-                ExistingPeriodicWorkPolicy.UPDATE,
-                periodicWorkRequest
-            )
     }
 }

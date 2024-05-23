@@ -1,4 +1,4 @@
-package com.example.currencyconversion.repository
+package com.example.currencyconversion.Utils
 
 import com.example.currencyconversion.data.models.CachedData
 import java.util.concurrent.TimeUnit

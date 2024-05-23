@@ -20,30 +20,32 @@ import javax.inject.Inject
 @HiltViewModel
 class Data_VM @Inject constructor(
     private val repository: ServerRepository,
-    private val roomRepository: ROOMRepository
+    private val roomRepository: ROOMRepository,
 ) : ViewModel() {
 
     private val _response: MutableLiveData<NetworkResult<ResponseExchangeList>> = MutableLiveData()
     val response: LiveData<NetworkResult<ResponseExchangeList>> = _response
 
-//For Checking the INSERTION in DB
-    /* private val _booleanValue = MutableLiveData<Boolean>()
-     val booleanValue: LiveData<Boolean> get() = _booleanValue*/
-
     private val _dBConversionData = MutableStateFlow<List<Rates>>(emptyList())
     val dBConversionData: StateFlow<List<Rates>> = _dBConversionData
 
-
-    fun getServerExchangeData(apiKey: String) = viewModelScope.launch {
-        repository.getServerExchangeData(apiKey)
+    fun getServerExchangeData(/*apiKey: String*/) = viewModelScope.launch {
+        repository.getServerExchangeData(/*apiKey*/)
             .collect { values: NetworkResult<ResponseExchangeList> ->
                 _response.value = values
             }
     }
 
+
+    //FOr ROOM DB
+//    For Checking the INSERTION in DB
+    private val _booleanValue = MutableLiveData<Boolean>()
+     val booleanValue: LiveData<Boolean> get() = _booleanValue
+
+
     fun insertDBExchangeData(rates: Rates) = viewModelScope.launch {
         //For Checking the INSERTION in DB
-        /*_booleanValue.value = */ roomRepository.insertDBExchangeData(rates)
+         _booleanValue.value =  roomRepository.insertDBExchangeData(rates)
     }
 
     fun getDBConversionData() {
@@ -60,9 +62,12 @@ class Data_VM @Inject constructor(
                 println("Updated StateFlow with rates")
             }
         }
+    }
+}
+
 
         //This is for changes list when i want to get it changes by Flow or LiveData
-        /*viewModelScope.launch {
+        /* viewModelScope.launch {
             roomRepository.getAll()
                 .flowOn(Dispatchers.IO)
                 .catch { e -> e.printStackTrace() }
@@ -71,5 +76,3 @@ class Data_VM @Inject constructor(
                     _dBConversionData.update { rates }
             }
         }*/
-    }
-}

@@ -5,8 +5,6 @@ import androidx.room.Room
 import com.example.currencyconversion.Utils.Constants.Companion.base_url
 import com.example.currencyconversion.network.Database.CurrencyDataBase
 import com.example.currencyconversion.network.server.retrofit.API
-import com.example.currencyconversion.Utils.Cache
-import com.example.currencyconversion.repository.DataRepository
 import com.example.currencyconversion.repository.LocalDataRepository
 import com.example.currencyconversion.repository.ROOMRepository
 import com.example.currencyconversion.repository.ServerRepository
@@ -54,18 +52,14 @@ object NetworkModule {
         return retrofit.create(API::class.java)
     }
 
+//    For ROOM DB
     @Provides
     fun getSQLRepository(currencyDataBase: CurrencyDataBase): LocalDataRepository {
         return ROOMRepository(currencyDataBase)
     }
 
-    @Provides
-    fun provideCache(): Cache {
-        return Cache()
-    }
-
-    @Provides
+   /* @Provides
     fun provideDataRepository(serverRepository: ServerRepository, cache: Cache): DataRepository {
         return DataRepository(serverRepository, cache)
-    }
+    }*/
 }

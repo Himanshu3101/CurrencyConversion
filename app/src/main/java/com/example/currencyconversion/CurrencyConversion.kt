@@ -16,7 +16,7 @@ class CurrencyConversion : Application(){
     override fun onCreate() {
         super.onCreate()
         // Initialize other components
-//        schedulePeriodicDataFetch()
+        schedulePeriodicDataFetch()
     }
 
     private fun schedulePeriodicDataFetch() {

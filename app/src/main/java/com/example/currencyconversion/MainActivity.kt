@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -35,48 +36,31 @@ class MainActivity : AppCompatActivity() {
         activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(activityMainBinding.root)
 
+//        viewModel.getServerExchangeData()
         observeServerConversionData()
-
+        ObserveDBConversionData()
 
         activityMainBinding.clear.setOnClickListener {
             activityMainBinding.textViewData.text = ""
         }
 
-
-        //        ObserveDBConversionData()
         activityMainBinding.getDBData.setOnClickListener {
 //            For ROOM DB
-//            viewModel.getDBConversionData()
+            viewModel.getDBConversionData()
         }
 
-
-
         activityMainBinding.getServerData.setOnClickListener {
-            viewModel.getServerExchangeData(BuildConfig.API_KEY)
+//            viewModel.getServerExchangeData(/*BuildConfig.API_KEY*/)
 //            schedulePeriodicDataFetch()
         }
 
-//For Checking the INSERTION in DB
-        /*viewModel.booleanValue.observe(this, Observer { value ->
+        //For Checking the INSERTION in DB
+        viewModel.booleanValue.observe(this, Observer { value ->
             // Handle the boolean value change
             Toast.makeText(this, "Boolean value is: $value", Toast.LENGTH_SHORT).show()
-        })*/
+        })
     }
 
-    private fun ObserveDBConversionData() {
-        try {
-            lifecycleScope.launch {
-                viewModel.dBConversionData.collect { rates ->
-                    println("Collected rates: $rates")
-                    val ratesText = rates.joinToString("\n") { it.toString() }
-                    activityMainBinding.textViewData.text = ratesText
-                }
-
-            }
-        } catch (e: Exception) {
-            e.stackTrace
-        }
-    }
 
     private fun observeServerConversionData() {
         try {
@@ -91,10 +75,9 @@ class MainActivity : AppCompatActivity() {
                         activityMainBinding.progress.visibility = View.GONE
                         activityMainBinding.textViewData.text = result._data?.rates?.toString()
 
-                        schedulePeriodicDataFetch()
 
                         //For ROOM DB
-                       /* result._data?.let {
+                        /*result._data?.let {
                             viewModel.insertDBExchangeData(it.rates)
                         }*/
                     }
@@ -111,21 +94,21 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun schedulePeriodicDataFetch() {
 
-        /*val workRequest = OneTimeWorkRequestBuilder<DataFetchWorker>().build()
-        WorkManager.getInstance(applicationContext).enqueue(workRequest)
-*/
 
-        val constraint = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
-        val workRequest = PeriodicWorkRequestBuilder<DataFetchWorker>(15, TimeUnit.MINUTES)
-            .setConstraints(constraint)
-            .build()
+    // For DB Observer
+    private fun ObserveDBConversionData() {
+        try {
+            lifecycleScope.launch {
+                viewModel.dBConversionData.collect { rates ->
+                    println("Collected rates: $rates")
+                    val ratesText = rates.joinToString("\n") { it.toString() }
+                    activityMainBinding.textViewData.text = ratesText
+                }
 
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "DataFetchWork",
-            ExistingPeriodicWorkPolicy.KEEP,
-            workRequest
-        )
+            }
+        } catch (e: Exception) {
+            e.stackTrace
+        }
     }
 }

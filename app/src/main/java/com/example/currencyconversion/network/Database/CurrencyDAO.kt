@@ -9,9 +9,9 @@ import com.example.currencyconversion.data.models.Rates
 @Dao
 interface CurrencyDAO {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertData(rates: Rates):Long
 
     @Query("SELECT * FROM Rates")
-    suspend fun getAllData() : List<Rates>/*kotlinx.coroutines.flow.Flow<List<Rates>>*/
+    suspend fun getAllData() : Rates
 }

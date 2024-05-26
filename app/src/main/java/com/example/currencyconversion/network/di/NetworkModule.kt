@@ -3,6 +3,8 @@ package com.example.currencyconversion.network.di
 import android.content.Context
 import androidx.room.Room
 import com.example.currencyconversion.Utils.Constants.Companion.base_url
+import com.example.currencyconversion.data.models.Rates
+import com.example.currencyconversion.network.Database.CurrencyDAO
 import com.example.currencyconversion.network.Database.CurrencyDataBase
 import com.example.currencyconversion.network.server.retrofit.API
 import com.example.currencyconversion.repository.LocalDataRepository
@@ -43,8 +45,8 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideServerRepository(@ApplicationContext context: Context, remoteDataSource: API): ServerRepository {
-        return ServerRepository(context,remoteDataSource)
+    fun provideServerRepository(@ApplicationContext context: Context, remoteDataSource: API, roomRepository: LocalDataRepository): ServerRepository {
+        return ServerRepository(context,remoteDataSource, roomRepository)
     }
 
     @Provides
@@ -52,14 +54,8 @@ object NetworkModule {
         return retrofit.create(API::class.java)
     }
 
-//    For ROOM DB
     @Provides
-    fun getSQLRepository(currencyDataBase: CurrencyDataBase): LocalDataRepository {
+    fun provideDataRepository(currencyDataBase: CurrencyDataBase): LocalDataRepository {
         return ROOMRepository(currencyDataBase)
     }
-
-   /* @Provides
-    fun provideDataRepository(serverRepository: ServerRepository, cache: Cache): DataRepository {
-        return DataRepository(serverRepository, cache)
-    }*/
 }

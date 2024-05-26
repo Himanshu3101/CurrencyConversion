@@ -6,8 +6,9 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Rates(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    @PrimaryKey
+    var id: Int = 0,
+    var Time: Long,
     val AED: Double,
     val AFN: Double,
     val ALL: Double,

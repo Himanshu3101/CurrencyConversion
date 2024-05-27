@@ -1,5 +1,6 @@
 package com.example.currencyconversion
 
+import android.R
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -7,31 +8,22 @@ import android.content.IntentFilter
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import android.widget.Toast
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
-import com.example.currencyconversion.Utils.Constants
-import com.example.currencyconversion.Utils.NetworkResultDeserializer
+import com.example.currencyconversion.utils.NetworkResultDeserializer
 import com.example.currencyconversion.network.server.NetworkResult
-import com.example.currencyconversion.ViewModels.Data_VM
-import com.example.currencyconversion.data.models.ResponseExchangeList
+import com.example.currencyconversion.viewModels.Data_VM
+import com.example.currencyconversion.models.ResponseExchangeList
 import com.example.currencyconversion.databinding.ActivityMainBinding
-import com.example.currencyconversion.workManager.DataFetchWorker
-import com.google.gson.Gson
+import com.example.currencyconversion.models.Currency
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -42,18 +34,40 @@ class MainActivity : AppCompatActivity() {
     private val dataUpdateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             intent?.let { result ->
-                val dataJson = result.getStringExtra("data")
-                dataJson?.let { json ->
-                    val gson = GsonBuilder()
-                        .registerTypeAdapter(
-                            object : TypeToken<NetworkResult<ResponseExchangeList>>() {}.type,
-                            NetworkResultDeserializer()
+
+                if (result.hasExtra("data")) {
+                    val dataJson = result.getStringExtra("data")
+                    dataJson?.let { json ->
+                        val gson = GsonBuilder()
+                            .registerTypeAdapter(
+                                object : TypeToken<NetworkResult<ResponseExchangeList>>() {}.type,
+                                NetworkResultDeserializer<ResponseExchangeList>()
+                            ).create()
+
+                        val result: NetworkResult<ResponseExchangeList> = gson.fromJson(
+                            json,
+                            object : TypeToken<NetworkResult<ResponseExchangeList>>() {}.type
                         )
-                        .create()
-                    val type = object : TypeToken<NetworkResult<ResponseExchangeList>>() {}.type
-                    val data: NetworkResult<ResponseExchangeList> = gson.fromJson(json, type)
-                    Log.e("MainActivityLog", "Receiver Value $data")
-                    viewModel.setExchangeData(data)
+                        Log.d("MainActivityLog", "Received Exchange Rates: ${result.data?.rates}")
+                        viewModel.setExchangeData(result)
+                    }
+                }
+
+                if (result.hasExtra("currencyData")) {
+                    val jsonCurrencyData = result.getStringExtra("currencyData")
+                    jsonCurrencyData?.let { currencyData ->
+                        val gson = GsonBuilder()
+                            .registerTypeAdapter(
+                                object : TypeToken<NetworkResult<Currency>>() {}.type,
+                                NetworkResultDeserializer<Currency>()
+                            ).create()
+
+                        val type = object : TypeToken<NetworkResult<Currency>>() {}.type
+                        val data: NetworkResult<Currency> = gson.fromJson(currencyData, type)
+
+                        Log.d("MainActivityLog", "Received Currency Data: $data")
+                        viewModel.setExchangeCurrency(data)
+                    }
                 }
             }
         }
@@ -65,58 +79,106 @@ class MainActivity : AppCompatActivity() {
         activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(activityMainBinding.root)
 
-        ObserverExchangeData()
-        ObserveDBConversionData()
-
         LocalBroadcastManager.getInstance(this).registerReceiver(
             dataUpdateReceiver,
             IntentFilter("com.example.UPDATE_DATA")
         )
 
-        val checkData = activityMainBinding.textViewData.text
-        Log.e("MainActivityLog", "before VM Method call $checkData")
-        if (activityMainBinding.textViewData.text.equals("Hello World!")
-            || activityMainBinding.textViewData.text.equals("")){
-              //- Need to place outside
-            viewModel.getDBConversionData().toString()
-            Log.e("MainActivityLog", "after VM Method call")
+        viewModel.exchangeRatesWorker.observe(this, Observer { result ->
+            result.data?.let {
+//                activityMainBinding.textViewData.text = it.rates.toString()
+            }
+        })
+
+        viewModel.exchangeCurrencyWorker.observe(this, Observer { result ->
+            result.data?.let {
+                spinnerAdapter(it)
+            }
+        })
+
+        ObserveDBConversionCurrency()
+        checkAndFetchData()
+
+        activityMainBinding.spinnerCurrency.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
+//                val selectedItem = items[position]
+//                Toast.makeText(this@MainActivity, "Selected: $selectedItem", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // Do nothing
+            }
         }
 
-        activityMainBinding.clear.setOnClickListener {
-            activityMainBinding.textViewData.text = ""
+
+
+    }
+
+    private fun spinnerAdapter(currency: Currency) {
+        val spinnerItems = arrayOf(currency)
+        val adapter = ArrayAdapter(this, R.layout.simple_spinner_item, spinnerItems)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        activityMainBinding.spinnerCurrency.adapter = adapter
+    }
+
+
+    //    1716839450795 - 1:21:44 - 1:36
+    private fun checkAndFetchData() {
+        lifecycleScope.launch {
+            val res = viewModel.isCurrencyTableEmpty()
+            if (!res) {
+                Log.d("MainActivityLog", "working with db")
+                viewModel.getDBConversionCurrency()
+            }
         }
     }
 
-    private fun ObserverExchangeData() {
-        viewModel.exchangeDataWorker.observe(this, Observer { result ->
-            result.data?.let {
-                activityMainBinding.textViewData.text = it.rates.toString()
+    private fun ObserveDBConversionCurrency() {
+        try {
+            lifecycleScope.launch {
+                viewModel.dBConversionCurrency.collect { currency ->
+                    currency.let {
+//                        activityMainBinding.textViewData.setText(it.toString())
+//                        spinnerAdapter(it.)
+                    }
+                }
+
             }
-        })
+        } catch (e: Exception) {
+            e.stackTrace
+            Log.e("MainActivityLog", "Error_" + e.message.toString())
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         LocalBroadcastManager.getInstance(this).unregisterReceiver(dataUpdateReceiver)
     }
-
-    // For DB Observer
-    private fun ObserveDBConversionData() {
-        try {
-            lifecycleScope.launch {
-                viewModel.dBConversionData.collect { rates ->
-                    Log.e("MainActivityLog", "Observer DB $rates.toString()")
-                    val ratesText = rates.joinToString("\n") { it.toString() }
-                    activityMainBinding.textViewData.text = ratesText
-                }
-
-            }
-        } catch (e: Exception) {
-            e.stackTrace
-        }
-    }
 }
 
+
+
+
+
+
+/*private fun ObserveDBConversionRates() {
+    try {
+        lifecycleScope.launch {
+            viewModel.dBConversionRates.collect { rates ->
+                rates.let {
+                    activityMainBinding.textViewData.text =
+                        rates.joinToString("\n") { it.toString() }
+                }
+//                    Log.e("MainActivityLog", "Observer DB $rates.toString()")
+//                    val ratesText = rates.joinToString("\n") { it.toString() }
+//                    activityMainBinding.textViewData.text = ratesText
+            }
+
+        }
+    } catch (e: Exception) {
+        e.stackTrace
+    }
+}*/
 
 
 //For Checking the INSERTION in DB

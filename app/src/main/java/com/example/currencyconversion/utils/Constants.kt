@@ -1,4 +1,4 @@
-package com.example.currencyconversion.Utils
+package com.example.currencyconversion.utils
 
 import android.content.Context
 import android.net.ConnectivityManager

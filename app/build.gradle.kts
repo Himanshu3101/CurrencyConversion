@@ -52,11 +52,12 @@ android {
 
 dependencies {
 
-    implementation("androidx.annotation:annotation:1.7.1")
+    implementation("androidx.annotation:annotation:1.8.0")
     implementation("androidx.work:work-runtime-ktx:2.9.0")
+    implementation("androidx.gridlayout:gridlayout:1.0.0")
     val hilt_version = "2.49"
     val hilt_work = "1.2.0"
-    val lifecycle_version = "2.7.0"
+    val lifecycle_version = "2.8.0"
     val retrofit_version = "2.9.0"
     val coroutine_version = "1.7.3"
     val roomVersion = "2.6.1"
@@ -65,6 +66,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation ("androidx.recyclerview:recyclerview:1.3.2")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

@@ -2,9 +2,7 @@ package com.example.currencyconversion.network.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.currencyconversion.Utils.Constants.Companion.base_url
-import com.example.currencyconversion.data.models.Rates
-import com.example.currencyconversion.network.Database.CurrencyDAO
+import com.example.currencyconversion.utils.Constants.Companion.base_url
 import com.example.currencyconversion.network.Database.CurrencyDataBase
 import com.example.currencyconversion.network.server.retrofit.API
 import com.example.currencyconversion.repository.LocalDataRepository

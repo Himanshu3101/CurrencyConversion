@@ -1,10 +1,10 @@
-package com.example.currencyconversion.data.models
+package com.example.currencyconversion.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 
-@Entity
+@Entity(tableName = "exchange_rates")
 data class Rates(
     @PrimaryKey
     var id: Int = 0,
@@ -134,65 +134,4 @@ data class Rates(
     )
 
 
-/*
-val PKR: Double,
-val PLN: Double,
-val PYG: Double,
-val QAR: Double,
-val RON: Double,
-val RSD: Double,
-val RUB: Double,
-val RWF: Double,
-val SAR: Double,
-val SBD: Double,
-val SCR: Double,
-val SDG: Double,
-val SEK: Double,
-val SGD: Double,
-val SHP: Double,
-val SLL: Double,
-val SOS: Double,
-val SRD: Double,
-val SSP: Double,
-val STD: Double,
-val STN: Double,
-val STR: Double,
-val SVC: Double,
-val SYP: Double,
-val SZL: Double,
-val THB: Double,
-val TJS: Double,
-val TMT: Double,
-val TND: Double,
-val TOP: Double,
-val TRY: Double,
-val TTD: Double,
-val TWD: Double,
-val TZS: Double,
-val UAH: Double,
-val UGX: Double,
-val USD: Double,
-val UYU: Double,
-val UZS: Double,
-val VEF_BLKMKT: Double,
-val VEF_DICOM: Double,
-val VEF_DIPRO: Double,
-val VES: Double,
-val VND: Double,
-val VUV: Double,
-val WST: Double,
-val XAF: Double,
-val XAG: Double,
-val XAU: Double,
-val XCD: Double,
-val XDR: Double,
-val XMR: Double,
-val XOF: Double,
-val XPD: Double,
-val XPF: Double,
-val XPT: Double,
-val XRP: Double,
-val YER: Double,
-val ZAR: Double,
-val ZMW: Double,
-val ZWL: Double*/
+

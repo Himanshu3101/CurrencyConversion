@@ -1,8 +1,8 @@
 package com.example.currencyconversion.network.server
 
 import android.content.Context
-import com.example.currencyconversion.Utils.Constants
-import com.example.currencyconversion.Utils.Constants.Companion.API_INTERNET_MESSAGE
+import com.example.currencyconversion.utils.Constants
+import com.example.currencyconversion.utils.Constants.Companion.API_INTERNET_MESSAGE
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

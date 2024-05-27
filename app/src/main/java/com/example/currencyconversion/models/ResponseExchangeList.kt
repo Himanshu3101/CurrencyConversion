@@ -1,4 +1,4 @@
-package com.example.currencyconversion.data.models
+package com.example.currencyconversion.models
 
 class ResponseExchangeList(
     val base: String,

@@ -26,23 +26,15 @@ class Data_VM @Inject constructor(
     private val _dBConversionRates = MutableStateFlow<List<Rates>>(emptyList())
     val dBConversionRates: StateFlow<List<Rates>> = _dBConversionRates
 
-    private val _dBConversionCurrency = MutableStateFlow<List<Currency>>(emptyList())
-    val dBConversionCurrency: StateFlow<List<Currency>> = _dBConversionCurrency
+    private val _dBConversionCurrency = MutableStateFlow<List<String?>>(emptyList())
+    val dBConversionCurrency: StateFlow<List<String?>> = _dBConversionCurrency
 
     private val _exchangeRatesWorker = MutableLiveData<NetworkResult<ResponseExchangeList>>()
     val exchangeRatesWorker : LiveData<NetworkResult<ResponseExchangeList>> = _exchangeRatesWorker
 
-    private val _exchangeCurrencyWorker = MutableLiveData<NetworkResult<Currency>>()
-    val exchangeCurrencyWorker : LiveData<NetworkResult<Currency>> = _exchangeCurrencyWorker
-
     fun setExchangeData(data: NetworkResult<ResponseExchangeList>) {
         Log.e("Data_VMLog", "For Rates Set By Worker")
         _exchangeRatesWorker.postValue(data)
-    }
-
-    fun setExchangeCurrency(result: NetworkResult<Currency>) {
-        Log.e("Data_VMLog", "For Currency Set By Worker")
-        _exchangeCurrencyWorker.postValue(result)
     }
 
     suspend fun isCurrencyTableEmpty(): Boolean {
@@ -69,7 +61,7 @@ class Data_VM @Inject constructor(
             Log.e("Data_VMLog", "ready to In WithContext")
             withContext(Dispatchers.Main) {
                 _dBConversionCurrency.value = emptyList()
-                _dBConversionCurrency.value = listOf(currency)
+                _dBConversionCurrency.value = currency
                 Log.e("Data_VMLog", "In WithContext")
             }
         }
@@ -77,6 +69,14 @@ class Data_VM @Inject constructor(
 
 
 }
+
+/*    private val _exchangeCurrencyWorker = MutableLiveData<String?>()
+    val exchangeCurrencyWorker : LiveData<String?> = _exchangeCurrencyWorker*/
+
+/* fun setExchangeCurrency(result: String?) {
+        Log.e("Data_VMLog", "For Currency Set By Worker")
+        _exchangeCurrencyWorker.postValue(result)
+    }*/
 
 
 // Optionally: Fetch data directly within ViewModel if required

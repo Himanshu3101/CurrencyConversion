@@ -19,7 +19,6 @@ import com.example.currencyconversion.network.server.NetworkResult
 import com.example.currencyconversion.viewModels.Data_VM
 import com.example.currencyconversion.models.ResponseExchangeList
 import com.example.currencyconversion.databinding.ActivityMainBinding
-import com.example.currencyconversion.models.Currency
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,7 +34,7 @@ class MainActivity : AppCompatActivity() {
         override fun onReceive(context: Context?, intent: Intent?) {
             intent?.let { result ->
 
-                if (result.hasExtra("data")) {
+                /*if (result.hasExtra("data")) {
                     val dataJson = result.getStringExtra("data")
                     dataJson?.let { json ->
                         val gson = GsonBuilder()
@@ -51,22 +50,13 @@ class MainActivity : AppCompatActivity() {
                         Log.d("MainActivityLog", "Received Exchange Rates: ${result.data?.rates}")
                         viewModel.setExchangeData(result)
                     }
-                }
-
+                }*/
                 if (result.hasExtra("currencyData")) {
-                    val jsonCurrencyData = result.getStringExtra("currencyData")
+                    val jsonCurrencyData = result?.getStringArrayExtra("currencyData")
                     jsonCurrencyData?.let { currencyData ->
-                        val gson = GsonBuilder()
-                            .registerTypeAdapter(
-                                object : TypeToken<NetworkResult<Currency>>() {}.type,
-                                NetworkResultDeserializer<Currency>()
-                            ).create()
-
-                        val type = object : TypeToken<NetworkResult<Currency>>() {}.type
-                        val data: NetworkResult<Currency> = gson.fromJson(currencyData, type)
-
-                        Log.d("MainActivityLog", "Received Currency Data: $data")
-                        viewModel.setExchangeCurrency(data)
+                        val listOfStrings = currencyData.toList()
+                        spinnerAdapter(listOfStrings)
+                        Log.d("MainActivityLog", "Received Exchange Currency: $currencyData")
                     }
                 }
             }
@@ -90,39 +80,43 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        viewModel.exchangeCurrencyWorker.observe(this, Observer { result ->
-            result.data?.let {
-                spinnerAdapter(it)
-            }
-        })
+
 
         ObserveDBConversionCurrency()
         checkAndFetchData()
 
-        activityMainBinding.spinnerCurrency.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
+        activityMainBinding.spinnerCurrency.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: android.view.View?,
+                    position: Int,
+                    id: Long
+                ) {
 //                val selectedItem = items[position]
 //                Toast.makeText(this@MainActivity, "Selected: $selectedItem", Toast.LENGTH_SHORT).show()
-            }
+                }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                // Do nothing
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                    // Do nothing
+                }
             }
-        }
-
 
 
     }
 
-    private fun spinnerAdapter(currency: Currency) {
-        val spinnerItems = arrayOf(currency)
-        val adapter = ArrayAdapter(this, R.layout.simple_spinner_item, spinnerItems)
+    private fun spinnerAdapter(currency: List<String?>) {
+        val adapter = ArrayAdapter(this, R.layout.simple_spinner_item, currency)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         activityMainBinding.spinnerCurrency.adapter = adapter
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(dataUpdateReceiver)
+    }
 
-    //    1716839450795 - 1:21:44 - 1:36
+    //For DB Methods
     private fun checkAndFetchData() {
         lifecycleScope.launch {
             val res = viewModel.isCurrencyTableEmpty()
@@ -138,8 +132,8 @@ class MainActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 viewModel.dBConversionCurrency.collect { currency ->
                     currency.let {
-//                        activityMainBinding.textViewData.setText(it.toString())
-//                        spinnerAdapter(it.)
+                        Log.d("MainActivityLog", "getting from db ${it.toString()}")
+                        spinnerAdapter(it)
                     }
                 }
 
@@ -149,16 +143,14 @@ class MainActivity : AppCompatActivity() {
             Log.e("MainActivityLog", "Error_" + e.message.toString())
         }
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(dataUpdateReceiver)
-    }
 }
 
-
-
-
+/*viewModel.exchangeCurrencyWorker.observe(this, Observer { result ->
+    result.let {
+//                spinnerAdapter(it)
+        activityMainBinding.textViewData.setText(it.toString())
+    }
+})*/
 
 
 /*private fun ObserveDBConversionRates() {

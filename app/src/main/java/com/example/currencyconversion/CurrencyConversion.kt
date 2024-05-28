@@ -26,7 +26,7 @@ class CurrencyConversion : Application() {
     private fun schedulePeriodicDataFetch() {
          Log.d("DataFetchWorker", "Conversion")
         val constraint = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
-        val workRequest = PeriodicWorkRequestBuilder<DataFetchWorker>(30, TimeUnit.MINUTES)
+        val workRequest = PeriodicWorkRequestBuilder<DataFetchWorker>(16, TimeUnit.MINUTES)
             .setConstraints(constraint)
             .build()
 

@@ -11,17 +11,21 @@ import com.example.currencyconversion.models.Rates
 interface CurrencyDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertData(rates: Rates):Long
+    suspend fun insertData(currencyRates: List<Rates>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCurrencies(currencies: Currency) : Long
+    suspend fun insertCurrencies(currencies: List<Currency>)
 
     @Query("SELECT * FROM exchange_rates")
     suspend fun getAllData() : Rates
 
-    @Query("SELECT * FROM currencies")
-    suspend fun getCurrencies(): Currency
+    @Query("SELECT currencyCode FROM currencies")
+    suspend fun getCurrencies(): List<String>
 
     @Query("SELECT COUNT(*) FROM currencies")
     suspend fun getCurrencyCount(): Int
+
+
+
+
 }

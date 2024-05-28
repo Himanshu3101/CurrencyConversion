@@ -19,5 +19,5 @@ interface API {
         "Content-Type: application/json"
     )
     @GET("currencies.json")
-    suspend fun getCurrencies() : Response<Currency>
+    suspend fun getCurrencies() : Response<Map<String, String>>
 }

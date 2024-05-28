@@ -16,11 +16,11 @@ inline fun <reified T> toResultFlow(context: Context, crossinline call: suspend 
         val isInternetConnected = Constants.hasInternetConnection(context)
         if (isInternetConnected) {
             emit(NetworkResult.Loading(true))
-            val c = call()
-            c?.let { response ->
+            val response = call()
+            response?.let { response ->
                 try {
                     if (response.isSuccessful && response.body() != null) {
-                        c.body()?.let {
+                        response.body()?.let {
                             emit(NetworkResult.Success(it))
                         }
                     }else{
@@ -31,11 +31,12 @@ inline fun <reified T> toResultFlow(context: Context, crossinline call: suspend 
 
                     }
                 } catch (e: Exception) {
-                    val errorMsg = response.errorBody()?.string().orEmpty()
-                    emit(NetworkResult.Error(errorMsg))
+                    emit(NetworkResult.Error(e.message.orEmpty()))
+                } finally {
+                    emit(NetworkResult.Loading(false))
                 }
-            }
-        } else{
+            } ?: emit(NetworkResult.Error("Response was null"))
+        } else {
             emit(NetworkResult.Error(API_INTERNET_MESSAGE))
         }
     }.flowOn(Dispatchers.IO)

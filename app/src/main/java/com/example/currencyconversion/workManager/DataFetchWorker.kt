@@ -38,44 +38,21 @@ class DataFetchWorker @AssistedInject constructor(
 
             exchangeRate.getServerExchangeRates(BuildConfig.API_KEY).collect { result ->
                 result.data?.let {
-
-                    Log.d("DataFetchWorker", "Fetched data Exchange Rates: ${result.data?.rates}")
-
-                    val gson = GsonBuilder()
-                        .registerTypeAdapter(object : TypeToken<NetworkResult<ResponseExchangeList>>() {}.type, NetworkResultDeserializer<ResponseExchangeList>())
-                        .create()
-
-                    val resultJson = gson.toJson(result)
-
-                    val intent = Intent("com.example.UPDATE_DATA")
-                    intent.putExtra("data", resultJson)
-                    LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
-                    Log.d("DataFetchWorker", "Result Handled WM  Exchange Rates:")
-
+                    Log.d("DataFetchWorker", "Fetched data Exchange Rates: ${result.data.rates}")
                 }
             }
 
             exchangeRate.getServerExchangeCurrency().collect { result ->
                 result.data?.let {
-
-                    Log.d("DataFetchWorker", "Fetched data Exchange Currency: ${result.data}")
-
-                    val gson = GsonBuilder()
-                        .registerTypeAdapter(object : TypeToken<NetworkResult<Currency>>() {}.type, NetworkResultDeserializer<Currency>())
-                        .create()
-
-                    val resultJson = gson.toJson(result)
-
+                    val currency = roomRepository.getAllCurrency()
+                    Log.d("DataFetchWorker", "Fetched data Exchange Currency: $currency")
                     val intent = Intent("com.example.UPDATE_DATA")
-                    intent.putExtra("currencyData", resultJson)
+                    val arrayOfStrings = currency.toTypedArray()
+                    intent.putExtra("currencyData", arrayOfStrings)
                     LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
-                    Log.d("DataFetchWorker", "Result Handled WM Exchange Currency")
-
+                    Log.d("DataFetchWorker", "Result Handled WM Exchange Currency $currency")
                 }
             }
-
-
-
             Log.d("DataFetchWorker", "Finished fetching data")
             Result.success()
         } catch (e: Exception) {
@@ -84,4 +61,3 @@ class DataFetchWorker @AssistedInject constructor(
         }
     }
 }
-

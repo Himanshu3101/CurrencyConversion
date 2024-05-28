@@ -17,49 +17,54 @@ import javax.inject.Inject
 interface ServerDataRepository {
     suspend fun getServerExchangeRates(apiKey: String): Flow<NetworkResult<ResponseExchangeList>>
 
-    suspend fun getServerExchangeCurrency(): Flow<NetworkResult<Currency>>
+    suspend fun getServerExchangeCurrency(): Flow<NetworkResult<Map<String, String>>>
 }
 
 //FOr ROOM DB
 interface LocalDataRepository {
-    suspend fun insertDBExchangeData(rates: Rates): Boolean
-    suspend fun insertCurrency(currency: Currency): Boolean
+    suspend fun insertDBExchangeData(rates: List<Rates>)/*: Boolean*/
+    suspend fun insertCurrency(currency: List<Currency>)
     suspend fun getAllRates(): Rates
-    suspend fun getAllCurrency(): Currency
+    suspend fun getAllCurrency(): List<String/*Currency*/>
     suspend fun isCurrencyTableEmpty(): Boolean
 }
 
 class ServerRepository @Inject constructor(
     @ApplicationContext private val context: android.content.Context,
     private val api: com.example.currencyconversion.network.server.retrofit.API,
-    private val roomRepository: /*com.example.currencyconversion.repository.ROOMRepository*/LocalDataRepository,
+    private val roomRepository:LocalDataRepository,
 ) : ServerDataRepository {
     override suspend fun getServerExchangeRates(apiKey: String): Flow<NetworkResult<ResponseExchangeList>> =
         flow {
-            val currentTime = System.currentTimeMillis()
-
-//                Log.d("Repository", "Server")
             toResultFlow(context) {
                 api.getLatestData(apiKey)
             }.collect { newData: NetworkResult<ResponseExchangeList> ->
                 newData.data?.let {
-                    newData.data.rates.Time = currentTime
-                    newData.data.rates.id = 1
-                    val re = roomRepository.insertDBExchangeData(it.rates)
-                    Log.d("Repository", "savReslt $re")
+                    val rateCard = it.rates.map { (rateCode, rate) ->
+                        Rates(rateCode, rate)
+                    }
+                    if (rateCard.all { rate -> rate.rateCode != null && rate.rate != null }) {
+                        roomRepository.insertDBExchangeData(rateCard)
+                        Log.d("Repository", "saveResult $rateCard")
+                    } else {
+                        Log.e("Repository", "Null values found in rates data: $rateCard")
+                    }
                 }
                 emit(newData)
             }
         }.flowOn(Dispatchers.IO)
 
-    override suspend fun getServerExchangeCurrency(): Flow<NetworkResult<Currency>> = flow {
+    override suspend fun getServerExchangeCurrency(): Flow<NetworkResult<Map<String, String>>> =
+        flow {
             toResultFlow(context) {
+                Log.d("Repository", "response currency")
                 api.getCurrencies()
-            }.collect { newData: NetworkResult<Currency> ->
+            }.collect { newData: NetworkResult<Map<String, String>> ->
                 newData.data?.let {
-                    newData.data.id = 1
-                    val re = roomRepository.insertCurrency(it)
-                    Log.d("Repository", "savCurrency $re")
+                    val currencies = it.map { (code, name) ->
+                        Currency(code, name)
+                    }
+                    roomRepository.insertCurrency(currencies)
                 }
                 emit(newData)
             }
@@ -67,35 +72,35 @@ class ServerRepository @Inject constructor(
 }
 
 
-    //FOr ROOM DB
-    class ROOMRepository @Inject constructor(private val currencyDataBase: CurrencyDataBase) :
-        LocalDataRepository {
+//FOr ROOM DB
+class ROOMRepository @Inject constructor(private val currencyDataBase: CurrencyDataBase) :
+    LocalDataRepository {
 
-        override suspend fun insertDBExchangeData(rates: Rates): Boolean {
-            return try {
-                currencyDataBase.currencyDao().insertData(rates) > 0
-            } catch (e: Exception) {
-                false
-            }
-        }
+    override suspend fun insertDBExchangeData(rates: List<Rates>){
+        return currencyDataBase.currencyDao().insertData(rates)
 
-        override suspend fun insertCurrency(currency: Currency): Boolean {
-            return currencyDataBase.currencyDao().insertCurrencies(currency) > 0
-        }
-
-        override suspend fun getAllRates(): Rates {
-            return currencyDataBase.currencyDao().getAllData()
-        }
-
-        override suspend fun getAllCurrency(): Currency {
-            return currencyDataBase.currencyDao().getCurrencies()
-        }
-
-        override suspend fun isCurrencyTableEmpty(): Boolean {
-            return currencyDataBase.currencyDao().getCurrencyCount() == 0
-        }
     }
 
+    override suspend fun insertCurrency(currencies: List<Currency>) {
+        currencyDataBase.currencyDao().insertCurrencies(currencies)
+    }
+
+    override suspend fun getAllRates(): Rates {
+        return currencyDataBase.currencyDao().getAllData()
+    }
+
+
+
+    override suspend fun getAllCurrency(): List<String> {
+        return currencyDataBase.currencyDao().getCurrencies()
+    }
+
+    override suspend fun isCurrencyTableEmpty(): Boolean {
+        return currencyDataBase.currencyDao().getCurrencyCount() == 0
+    }
+
+
+}
 
 
 /*private fun isDataExpired(data: Rates, currentTime: Long): Boolean {
@@ -113,8 +118,6 @@ class ServerRepository @Inject constructor(
         }
     }
 }*/
-
-
 
 
 /*  getServerExchangeData()

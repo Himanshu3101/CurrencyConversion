@@ -20,7 +20,10 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.currencyconversion.viewModels.Data_VM
 import com.example.currencyconversion.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -33,6 +36,16 @@ class MainActivity : AppCompatActivity() {
     private val dataUpdateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             intent?.let { result ->
+
+                /*if (result.hasExtra("basedCurrency")) {
+                    val dataJson = result.getStringExtra("basedCurrency")
+                    dataJson?.let { json ->
+                        Log.d("MainActivityLog", "Received Exchange Rates: $json")
+                    }
+                }*/
+
+
+
                 if (result.hasExtra("currencyData")) {
                     Log.d("MainActivityLog", "Start MainActivity by Worker")
                     val jsonCurrencyData = result?.getStringArrayExtra("currencyData")
@@ -65,41 +78,59 @@ class MainActivity : AppCompatActivity() {
         ObserveDBConversionCurrency()
         checkAndFetchData()
 
-        activityMainBinding.spinnerCurrency.onItemSelectedListener = object :AdapterView.OnItemSelectedListener{
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                if (position > 0) {
-                    selectedCurrency = parent?.getItemAtPosition(position).toString()
-                    currencyCalculation(activityMainBinding.editTextAmount.text.toString(),selectedCurrency)
+        activityMainBinding.spinnerCurrency.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    if (position > 0) {
+                        selectedCurrency = parent?.getItemAtPosition(position).toString()
+                        currencyCalculation(
+                            activityMainBinding.editTextAmount.text.toString(),
+                            selectedCurrency
+                        )
+                    }
                 }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                    TODO("Not yet implemented")
+                }
+
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                TODO("Not yet implemented")
+        activityMainBinding.editTextAmount.onFocusChangeListener =
+            View.OnFocusChangeListener { v, hasFocus ->
+                activityMainBinding.editTextAmount.setText("$")
             }
-
-        }
 
         activityMainBinding.editTextAmount.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                    Log.d("MainActivityLog","afterTextChanged")
-                    currencyCalculation(s.toString(),selectedCurrency)
+                currencyCalculation(s.toString(), selectedCurrency)
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
+            }
         })
     }
 
-    private fun currencyCalculation(amount: String, selectedItem: String) {
-        if(amount.isNotEmpty() && selectedItem!="Selected Currency"){
+    private fun currencyCalculation(amount: String, selectedCurrency: String) {
+        Log.d("MainActivityLog", "Before $amount $selectedCurrency")
+        if (amount.isNotEmpty() && amount != "$" && selectedCurrency != "Selected Currency") {
+            var amt = amount.removeSuffix("$")
             // To do Calculation. Here.,
+            lifecycleScope.launch {
+                val baseRate = viewModel.getSelectedCurrencyRate("USD")
+                val conversionRate = viewModel.getSelectedCurrencyRate(selectedCurrency)
+                var result = (baseRate * conversionRate)
+                Log.d("MainActivityLog", "Calc Complete $result")
+            }
         }
     }
 

@@ -39,6 +39,13 @@ class DataFetchWorker @AssistedInject constructor(
             exchangeRate.getServerExchangeRates(BuildConfig.API_KEY).collect { result ->
                 result.data?.let {
                     Log.d("DataFetchWorker", "Fetched data Exchange Rates: ${result.data.rates}")
+
+
+
+
+                    /*val intent = Intent("com.example.UPDATE_DATA")
+                    intent.putExtra("basedCurrency", it.rates["USD"])
+                    LocalBroadcastManager.getInstance(context).sendBroadcast(intent)*/
                 }
             }
 

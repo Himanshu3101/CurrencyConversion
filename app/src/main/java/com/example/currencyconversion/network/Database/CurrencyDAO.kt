@@ -16,8 +16,8 @@ interface CurrencyDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCurrencies(currencies: List<Currency>)
 
-    @Query("SELECT * FROM exchange_rates")
-    suspend fun getAllData() : Rates
+    @Query("SELECT rate FROM exchange_rates where rateCode = :currencyCode")
+    suspend fun getAllData(currencyCode: String?): Double
 
     @Query("SELECT currencyCode FROM currencies")
     suspend fun getCurrencies(): List<String>

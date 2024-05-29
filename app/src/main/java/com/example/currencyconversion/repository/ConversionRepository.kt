@@ -22,10 +22,10 @@ interface ServerDataRepository {
 
 //FOr ROOM DB
 interface LocalDataRepository {
-    suspend fun insertDBExchangeData(rates: List<Rates>)/*: Boolean*/
+    suspend fun insertDBExchangeData(rates: List<Rates>)
     suspend fun insertCurrency(currency: List<Currency>)
-    suspend fun getAllRates(): Rates
-    suspend fun getAllCurrency(): List<String/*Currency*/>
+    suspend fun getAllRates(currencyCountry: String?): Double
+    suspend fun getAllCurrency(): List<String>
     suspend fun isCurrencyTableEmpty(): Boolean
 }
 
@@ -76,30 +76,30 @@ class ServerRepository @Inject constructor(
 class ROOMRepository @Inject constructor(private val currencyDataBase: CurrencyDataBase) :
     LocalDataRepository {
 
+        // Rates Insertion from Server
     override suspend fun insertDBExchangeData(rates: List<Rates>){
         return currencyDataBase.currencyDao().insertData(rates)
 
     }
 
+    // Currency Insertion from Server
     override suspend fun insertCurrency(currencies: List<Currency>) {
         currencyDataBase.currencyDao().insertCurrencies(currencies)
     }
 
-    override suspend fun getAllRates(): Rates {
-        return currencyDataBase.currencyDao().getAllData()
-    }
-
-
-
+    // Get Currency List from DB
     override suspend fun getAllCurrency(): List<String> {
         return currencyDataBase.currencyDao().getCurrencies()
     }
 
+    //Frr App Validation from DB
     override suspend fun isCurrencyTableEmpty(): Boolean {
         return currencyDataBase.currencyDao().getCurrencyCount() == 0
     }
 
-
+    override suspend fun getAllRates(currencyCountry: String?): Double {
+        return currencyDataBase.currencyDao().getAllData(currencyCountry)
+    }
 }
 
 

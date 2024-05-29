@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.currencyconversion.models.Currency
 import com.example.currencyconversion.models.Rates
 import com.example.currencyconversion.network.server.NetworkResult
 import com.example.currencyconversion.models.ResponseExchangeList
@@ -41,7 +40,7 @@ class Data_VM @Inject constructor(
         return roomRepository.isCurrencyTableEmpty()
     }
 
-    fun getDBConversionRates() {
+    /*fun getDBConversionRates() {
         Log.e("Data_VMLog", "GetDB")
         viewModelScope.launch(Dispatchers.IO) {
             val rates = roomRepository.getAllRates()
@@ -52,7 +51,7 @@ class Data_VM @Inject constructor(
                 Log.e("Data_VMLog", "In WithContext")
             }
         }
-    }
+    }*/
 
     fun getDBConversionCurrency() {
         Log.e("Data_VMLog", "GetDB")
@@ -67,6 +66,9 @@ class Data_VM @Inject constructor(
         }
     }
 
+    suspend fun getSelectedCurrencyRate(currencyCountry: String?): Double {
+             return roomRepository.getAllRates(currencyCountry)
+    }
 
 }
 

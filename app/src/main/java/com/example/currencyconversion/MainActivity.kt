@@ -7,20 +7,18 @@ import android.content.Intent
 import android.content.IntentFilter
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.example.currencyconversion.utils.NetworkResultDeserializer
-import com.example.currencyconversion.network.server.NetworkResult
 import com.example.currencyconversion.viewModels.Data_VM
-import com.example.currencyconversion.models.ResponseExchangeList
 import com.example.currencyconversion.databinding.ActivityMainBinding
-import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -29,34 +27,18 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel: Data_VM by viewModels()
     lateinit var activityMainBinding: ActivityMainBinding
+    lateinit var listOfCurrency: List<String?>
+    var selectedCurrency: String = "Selected Currency"
 
     private val dataUpdateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             intent?.let { result ->
-
-                /*if (result.hasExtra("data")) {
-                    val dataJson = result.getStringExtra("data")
-                    dataJson?.let { json ->
-                        val gson = GsonBuilder()
-                            .registerTypeAdapter(
-                                object : TypeToken<NetworkResult<ResponseExchangeList>>() {}.type,
-                                NetworkResultDeserializer<ResponseExchangeList>()
-                            ).create()
-
-                        val result: NetworkResult<ResponseExchangeList> = gson.fromJson(
-                            json,
-                            object : TypeToken<NetworkResult<ResponseExchangeList>>() {}.type
-                        )
-                        Log.d("MainActivityLog", "Received Exchange Rates: ${result.data?.rates}")
-                        viewModel.setExchangeData(result)
-                    }
-                }*/
                 if (result.hasExtra("currencyData")) {
+                    Log.d("MainActivityLog", "Start MainActivity by Worker")
                     val jsonCurrencyData = result?.getStringArrayExtra("currencyData")
                     jsonCurrencyData?.let { currencyData ->
-                        val listOfStrings = currencyData.toList()
-                        spinnerAdapter(listOfStrings)
-                        Log.d("MainActivityLog", "Received Exchange Currency: $currencyData")
+                        listOfCurrency = currencyData.toList()
+                        spinnerAdapter(listOfCurrency)
                     }
                 }
             }
@@ -80,35 +62,53 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-
-
         ObserveDBConversionCurrency()
         checkAndFetchData()
 
-        activityMainBinding.spinnerCurrency.onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: android.view.View?,
-                    position: Int,
-                    id: Long
-                ) {
-//                val selectedItem = items[position]
-//                Toast.makeText(this@MainActivity, "Selected: $selectedItem", Toast.LENGTH_SHORT).show()
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-                    // Do nothing
+        activityMainBinding.spinnerCurrency.onItemSelectedListener = object :AdapterView.OnItemSelectedListener{
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                if (position > 0) {
+                    selectedCurrency = parent?.getItemAtPosition(position).toString()
+                    currencyCalculation(activityMainBinding.editTextAmount.text.toString(),selectedCurrency)
                 }
             }
 
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                TODO("Not yet implemented")
+            }
 
+        }
+
+        activityMainBinding.editTextAmount.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                    Log.d("MainActivityLog","afterTextChanged")
+                    currencyCalculation(s.toString(),selectedCurrency)
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+    }
+
+    private fun currencyCalculation(amount: String, selectedItem: String) {
+        if(amount.isNotEmpty() && selectedItem!="Selected Currency"){
+            // To do Calculation. Here.,
+        }
     }
 
     private fun spinnerAdapter(currency: List<String?>) {
-        val adapter = ArrayAdapter(this, R.layout.simple_spinner_item, currency)
+        val currencyList = listOf("Select Currency") + currency
+        val adapter = ArrayAdapter(this, R.layout.simple_spinner_item, currencyList)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         activityMainBinding.spinnerCurrency.adapter = adapter
+        activityMainBinding.spinnerCurrency.setSelection(0)
     }
 
     override fun onDestroy() {
@@ -121,7 +121,6 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val res = viewModel.isCurrencyTableEmpty()
             if (!res) {
-                Log.d("MainActivityLog", "working with db")
                 viewModel.getDBConversionCurrency()
             }
         }
@@ -132,11 +131,10 @@ class MainActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 viewModel.dBConversionCurrency.collect { currency ->
                     currency.let {
-                        Log.d("MainActivityLog", "getting from db ${it.toString()}")
-                        spinnerAdapter(it)
+                        listOfCurrency = it.toList()
+                        spinnerAdapter(listOfCurrency)
                     }
                 }
-
             }
         } catch (e: Exception) {
             e.stackTrace

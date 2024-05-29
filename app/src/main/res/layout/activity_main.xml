@@ -6,11 +6,12 @@
     android:padding="10dp">
 
     <androidx.appcompat.widget.AppCompatEditText
-        android:id="@+id/textViewData"
+        android:id="@+id/editTextAmount"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:padding="10dp"
+        android:padding="20dp"
         android:textAlignment="viewEnd"
+        android:inputType="numberDecimal"
         android:hint="@string/enterAmount"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -18,9 +19,10 @@
 
     <androidx.appcompat.widget.AppCompatSpinner
         android:id="@+id/spinnerCurrency"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/textViewData"
+        android:padding="20dp"
+        app:layout_constraintTop_toBottomOf="@id/editTextAmount"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintWidth_percent="0.3" />
 
@@ -41,46 +43,3 @@
     </androidx.gridlayout.widget.GridLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
-<!--<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:padding="16dp">
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/textViewData"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="05dp"
-        android:text="Hello"
-        android:textSize="25sp"
-        android:textAlignment="textEnd"
-        android:padding="05dp"
-        android:background="@drawable/textview_border"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="parent"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="#EFEFEF"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="parent"
-        app:layout_constraintWidth_percent="0.5" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>-->
-
-<!--<ProgressBar
-android:id="@+id/progress"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:visibility="gone"
-android:layout_gravity="center" />-->

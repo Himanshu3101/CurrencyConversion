@@ -45,12 +45,11 @@ class DataFetchWorker @AssistedInject constructor(
             exchangeRate.getServerExchangeCurrency().collect { result ->
                 result.data?.let {
                     val currency = roomRepository.getAllCurrency()
-                    Log.d("DataFetchWorker", "Fetched data Exchange Currency: $currency")
                     val intent = Intent("com.example.UPDATE_DATA")
                     val arrayOfStrings = currency.toTypedArray()
                     intent.putExtra("currencyData", arrayOfStrings)
                     LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
-                    Log.d("DataFetchWorker", "Result Handled WM Exchange Currency $currency")
+                    Log.d("DataFetchWorker", "Fetched data Exchange Currency: $currency")
                 }
             }
             Log.d("DataFetchWorker", "Finished fetching data")

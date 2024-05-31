@@ -24,7 +24,7 @@ interface ServerDataRepository {
 interface LocalDataRepository {
     suspend fun insertDBExchangeData(rates: List<Rates>)
     suspend fun insertCurrency(currency: List<Currency>)
-    suspend fun getAllRates(currencyCountry: String?): Double
+    suspend fun getAllRates(currencyCountry: String?): Double?
     suspend fun getAllCurrency(): List<String>
     suspend fun isCurrencyTableEmpty(): Boolean
 }
@@ -97,7 +97,7 @@ class ROOMRepository @Inject constructor(private val currencyDataBase: CurrencyD
         return currencyDataBase.currencyDao().getCurrencyCount() == 0
     }
 
-    override suspend fun getAllRates(currencyCountry: String?): Double {
+    override suspend fun getAllRates(currencyCountry: String?): Double? {
         return currencyDataBase.currencyDao().getAllData(currencyCountry)
     }
 }

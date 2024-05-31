@@ -78,6 +78,8 @@ class MainActivity : AppCompatActivity() {
         ObserveDBConversionCurrency()
         checkAndFetchData()
 
+
+
         activityMainBinding.spinnerCurrency.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
@@ -101,38 +103,82 @@ class MainActivity : AppCompatActivity() {
 
             }
 
-        activityMainBinding.editTextAmount.onFocusChangeListener =
-            View.OnFocusChangeListener { v, hasFocus ->
-                activityMainBinding.editTextAmount.setText("$")
-            }
+        /* activityMainBinding.editTextAmount.onFocusChangeListener =
+             View.OnFocusChangeListener { v, hasFocus ->
+                 activityMainBinding.editTextAmount.setText("$")
+             }*/
 
         activityMainBinding.editTextAmount.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                currencyCalculation(s.toString(), selectedCurrency)
+                currencyCalculation(s.toString(), "INR")
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
 
             }
         })
+
+
     }
 
-    private fun currencyCalculation(amount: String, selectedCurrency: String) {
-        Log.d("MainActivityLog", "Before $amount $selectedCurrency")
-        if (amount.isNotEmpty() && amount != "$" && selectedCurrency != "Selected Currency") {
-            var amt = amount.removeSuffix("$")
-            // To do Calculation. Here.,
-            lifecycleScope.launch {
-                val baseRate = viewModel.getSelectedCurrencyRate("USD")
-                val conversionRate = viewModel.getSelectedCurrencyRate(selectedCurrency)
-                var result = (baseRate * conversionRate)
-                Log.d("MainActivityLog", "Calc Complete $result")
+    private fun currencyCalculation(inputAmt: String, selectedCurrency: String) {
+        // To do Calculation. Here.,
+        if (inputAmt.isNotEmpty() && selectedCurrency != "Selected Currency") {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val baseRate = viewModel.getSelectedCurrencyRate(selectedCurrency).toString().toDouble()
+
+                var targetRate: Double? = 0.0
+                var result: Double? = 0.0
+
+                for (currency in listOfCurrency) {
+                    targetRate = viewModel.getSelectedCurrencyRate(currency)
+
+                    if (targetRate == null) {
+                        var currencySplit = currency?.let { currency.split(it.last()) }
+
+                        for (splitCurrency in listOfCurrency) {
+                            var currSplitList = splitCurrency?.let { splitCurrency.split(it.last()) }
+
+                            if (currencySplit != null) {
+                                if (currencySplit.equals(currSplitList)) {
+                                    if(currency!=splitCurrency){
+
+                                        targetRate = viewModel.getSelectedCurrencyRate(splitCurrency)
+                                        result = targetRate?.let {
+                                            convertCurrency(inputAmt.toDouble(), baseRate, it)
+                                        }
+                                    }
+                                }else{
+                                    Log.d(
+                                        "MainActivityLog",
+                                        "Don't have any approximate conversion using available exchange rates of related or newer versions of the currency"
+                                    )
+                                }
+                            }
+                        }
+                    } else {
+                        result = convertCurrency(inputAmt.toDouble(), baseRate, targetRate)
+                    }
+                    launch(Dispatchers.Main) {
+                        //Result Handl For UI
+                        Log.d(
+                            "MainActivityLog",
+                            "Coversion $inputAmt $selectedCurrency is approximately $result $currency"
+                        )
+                    }
+                }
             }
         }
     }
+
+    fun convertCurrency(amount: Double, sourceRate: Double, targetRate: Double): Double {
+        return (amount / sourceRate) * targetRate
+    }
+
 
     private fun spinnerAdapter(currency: List<String?>) {
         val currencyList = listOf("Select Currency") + currency

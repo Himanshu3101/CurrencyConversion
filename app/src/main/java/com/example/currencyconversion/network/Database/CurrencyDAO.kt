@@ -17,7 +17,7 @@ interface CurrencyDAO {
     suspend fun insertCurrencies(currencies: List<Currency>)
 
     @Query("SELECT rate FROM exchange_rates where rateCode = :currencyCode")
-    suspend fun getAllData(currencyCode: String?): Double
+    suspend fun getAllData(currencyCode: String?): Double?
 
     @Query("SELECT currencyCode FROM currencies")
     suspend fun getCurrencies(): List<String>

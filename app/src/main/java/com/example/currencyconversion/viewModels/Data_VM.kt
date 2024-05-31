@@ -66,7 +66,7 @@ class Data_VM @Inject constructor(
         }
     }
 
-    suspend fun getSelectedCurrencyRate(currencyCountry: String?): Double {
+    suspend fun getSelectedCurrencyRate(currencyCountry: String?): Double? {
              return roomRepository.getAllRates(currencyCountry)
     }
 

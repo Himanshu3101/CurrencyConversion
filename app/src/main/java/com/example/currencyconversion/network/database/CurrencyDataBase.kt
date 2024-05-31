@@ -1,4 +1,4 @@
-package com.example.currencyconversion.network.Database
+package com.example.currencyconversion.network.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

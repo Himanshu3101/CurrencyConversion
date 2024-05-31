@@ -6,7 +6,7 @@ import com.example.currencyconversion.models.Rates
 import com.example.currencyconversion.network.server.NetworkResult
 import com.example.currencyconversion.network.server.toResultFlow
 import com.example.currencyconversion.models.ResponseExchangeList
-import com.example.currencyconversion.network.Database.CurrencyDataBase
+import com.example.currencyconversion.network.database.CurrencyDataBase
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -43,11 +43,8 @@ class ServerRepository @Inject constructor(
                     val rateCard = it.rates.map { (rateCode, rate) ->
                         Rates(rateCode, rate)
                     }
-                    if (rateCard.all { rate -> rate.rateCode != null && rate.rate != null }) {
+                    if (rateCard.all { rate -> rate.rate != null }) {
                         roomRepository.insertDBExchangeData(rateCard)
-                        Log.d("Repository", "saveResult $rateCard")
-                    } else {
-                        Log.e("Repository", "Null values found in rates data: $rateCard")
                     }
                 }
                 emit(newData)
@@ -101,58 +98,5 @@ class ROOMRepository @Inject constructor(private val currencyDataBase: CurrencyD
         return currencyDataBase.currencyDao().getAllData(currencyCountry)
     }
 }
-
-
-/*private fun isDataExpired(data: Rates, currentTime: Long): Boolean {
-    val elapsedTime = currentTime - data.Time
-    return elapsedTime >= TimeUnit.MINUTES.toMillis(16)
-}*/
-
-/*class ServerRepository @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val api: API,
-) : ServerDataRepository {
-    override suspend fun getServerExchangeData(apiKey: String): Flow<NetworkResult<ResponseExchangeList>> {
-        return toResultFlow(context) {
-            api.getLatestData(apiKey)
-        }
-    }
-}*/
-
-
-/*  getServerExchangeData()
-val currentTime = System.currentTimeMillis()
-           Log.d("Repository", "ConversionRepo")
-
-
-           val rates = roomRepository.getAllRates()
-           if (rates != null) {
-               Log.d("Repository", "DB not null")
-               val rates = roomRepository.getAllRates()
-               var bol = isDataExpired(rates, currentTime)
-               Log.d("Repository", "DB_beforeIf$bol")
-               if (!bol*//*rates.let { isDataExpired(it, currentTime) }!!*//*) {
-                    Log.d("Repository", "DB_afterIf$bol")
-                    emit(
-                        NetworkResult.Success(
-                            ResponseExchangeList(
-                                "",
-                                "",
-                                "",
-                                rates,
-                                currentTime.toInt()
-                            )
-                        )
-                    )
-                }
-            } else {*/
-
-
-
-
-
-
-
-
 
 

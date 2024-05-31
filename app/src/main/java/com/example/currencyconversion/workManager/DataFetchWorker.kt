@@ -8,18 +8,12 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.currencyconversion.BuildConfig
-import com.example.currencyconversion.models.Currency
-import com.example.currencyconversion.utils.NetworkResultDeserializer
-import com.example.currencyconversion.models.ResponseExchangeList
 import com.example.currencyconversion.network.di.NetworkModule
-import com.example.currencyconversion.network.server.NetworkResult
 import com.example.currencyconversion.network.server.retrofit.API
 import com.example.currencyconversion.repository.ServerRepository
-import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-//import kotlinx.coroutines.flow.internal.NopCollector.emit
+
 
 @HiltWorker
 class DataFetchWorker @AssistedInject constructor(
@@ -39,13 +33,6 @@ class DataFetchWorker @AssistedInject constructor(
             exchangeRate.getServerExchangeRates(BuildConfig.API_KEY).collect { result ->
                 result.data?.let {
                     Log.d("DataFetchWorker", "Fetched data Exchange Rates: ${result.data.rates}")
-
-
-
-
-                    /*val intent = Intent("com.example.UPDATE_DATA")
-                    intent.putExtra("basedCurrency", it.rates["USD"])
-                    LocalBroadcastManager.getInstance(context).sendBroadcast(intent)*/
                 }
             }
 

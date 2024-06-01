@@ -75,7 +75,7 @@ class ROOMRepository @Inject constructor(private val currencyDataBase: CurrencyD
 
         // Rates Insertion from Server
     override suspend fun insertDBExchangeData(rates: List<Rates>){
-        return currencyDataBase.currencyDao().insertData(rates)
+        return currencyDataBase.currencyDao().insertRateData(rates)
 
     }
 
@@ -95,7 +95,7 @@ class ROOMRepository @Inject constructor(private val currencyDataBase: CurrencyD
     }
 
     override suspend fun getAllRates(currencyCountry: String?): Double? {
-        return currencyDataBase.currencyDao().getAllData(currencyCountry)
+        return currencyDataBase.currencyDao().getRateData(currencyCountry)
     }
 }
 

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="MainActivity">
+      <entry key="CurrencyDaoTest">
         <State />
       </entry>
       <entry key="app">
@@ -20,6 +20,18 @@
           </targetSelectedWithDropDown>
           <timeTargetWasSelectedWithDropDown value="2024-05-17T08:53:18.646479900Z" />
         </State>
+      </entry>
+      <entry key="getCurrenciesCount_test()">
+        <State />
+      </entry>
+      <entry key="getCurrencyCount_returnsZeroWhenNoData()">
+        <State />
+      </entry>
+      <entry key="getRateData_handlesNullRateCode()">
+        <State />
+      </entry>
+      <entry key="getRateData_returnsNullForNonexistentCRateCode()">
+        <State />
       </entry>
     </value>
   </component>

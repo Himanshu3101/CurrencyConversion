@@ -55,6 +55,7 @@ dependencies {
     implementation("androidx.annotation:annotation:1.8.0")
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation("androidx.gridlayout:gridlayout:1.0.0")
+    implementation("androidx.test:core-ktx:1.5.0")
     val hilt_version = "2.49"
     val hilt_work = "1.2.0"
     val lifecycle_version = "2.8.0"
@@ -70,6 +71,11 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    testImplementation("androidx.room:room-testing:$roomVersion")
+    androidTestImplementation("androidx.room:room-testing:$roomVersion")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    androidTestImplementation("androidx.arch.core:core-testing:2.2.0")
 
     // Hilt
     implementation("com.google.dagger:hilt-android:$hilt_version")

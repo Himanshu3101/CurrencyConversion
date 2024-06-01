@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun currencyCalculation(inputAmt: String, selectedCurrency: String) {
+    fun currencyCalculation(inputAmt: String, selectedCurrency: String) {
         // To do Calculation. Here.,
         if (inputAmt.isNotEmpty() && selectedCurrency != "Selected Currency") {
             lifecycleScope.launch(Dispatchers.IO) {
@@ -119,13 +119,18 @@ class MainActivity : AppCompatActivity() {
 
                             if (currencySplit != null) {
                                 if (currencySplit.equals(currSplitList)) {
-                                    if(currency!=splitCurrency){
 
+
+
+                                    if(currency!=splitCurrency){
                                         targetRate = viewModel.getSelectedCurrencyRate(splitCurrency)
                                         result = targetRate?.let {
                                             convertCurrency(inputAmt.toDouble(), baseRate, it)
                                         }
                                     }
+
+
+
                                 }else{
                                     Log.d(
                                         "MainActivityLog",

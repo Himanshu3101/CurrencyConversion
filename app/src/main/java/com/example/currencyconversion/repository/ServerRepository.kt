@@ -6,8 +6,9 @@ import com.example.currencyconversion.models.Rates
 import com.example.currencyconversion.network.server.NetworkResult
 import com.example.currencyconversion.network.server.toResultFlow
 import com.example.currencyconversion.models.ResponseExchangeList
-import com.example.currencyconversion.network.database.CurrencyDataBase
 import com.example.currencyconversion.network.server.API
+import com.example.currencyconversion.repository.interfaces.LocalDataRepository
+import com.example.currencyconversion.repository.interfaces.ServerDataRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -15,25 +16,11 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
-interface ServerDataRepository {
-    suspend fun getServerExchangeRates(apiKey: String): Flow<NetworkResult<ResponseExchangeList>>
-
-    suspend fun getServerExchangeCurrency(): Flow<NetworkResult<Map<String, String>>>
-}
-
-//FOr ROOM DB
-interface LocalDataRepository {
-    suspend fun insertDBExchangeData(rates: List<Rates>)
-    suspend fun insertCurrency(currency: List<Currency>)
-    suspend fun getAllRates(currencyCountry: String?): Double?
-    suspend fun getAllCurrency(): List<String>
-    suspend fun isCurrencyTableEmpty(): Boolean
-}
 
 class ServerRepository @Inject constructor(
     @ApplicationContext private val context: android.content.Context,
     private val api: API,
-    private val roomRepository:LocalDataRepository,
+    private val roomRepository: LocalDataRepository,
 ) : ServerDataRepository {
     override suspend fun getServerExchangeRates(apiKey: String): Flow<NetworkResult<ResponseExchangeList>> =
         flow {
@@ -67,37 +54,6 @@ class ServerRepository @Inject constructor(
                 emit(newData)
             }
         }.flowOn(Dispatchers.IO)
-}
-
-
-//FOr ROOM DB
-class ROOMRepository @Inject constructor(private val currencyDataBase: CurrencyDataBase) :
-    LocalDataRepository {
-
-        // Rates Insertion from Server
-    override suspend fun insertDBExchangeData(rates: List<Rates>){
-        return currencyDataBase.currencyDao().insertRateData(rates)
-
-    }
-
-    // Currency Insertion from Server
-    override suspend fun insertCurrency(currencies: List<Currency>) {
-        currencyDataBase.currencyDao().insertCurrencies(currencies)
-    }
-
-    // Get Currency List from DB
-    override suspend fun getAllCurrency(): List<String> {
-        return currencyDataBase.currencyDao().getCurrencies()
-    }
-
-    //Frr App Validation from DB
-    override suspend fun isCurrencyTableEmpty(): Boolean {
-        return currencyDataBase.currencyDao().getCurrencyCount() == 0
-    }
-
-    override suspend fun getAllRates(currencyCountry: String?): Double? {
-        return currencyDataBase.currencyDao().getRateData(currencyCountry)
-    }
 }
 
 

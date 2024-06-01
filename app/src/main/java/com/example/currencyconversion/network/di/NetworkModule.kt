@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.currencyconversion.utils.Constants.Companion.base_url
 import com.example.currencyconversion.network.database.CurrencyDataBase
-import com.example.currencyconversion.network.server.retrofit.API
+import com.example.currencyconversion.network.server.API
 import com.example.currencyconversion.repository.LocalDataRepository
 import com.example.currencyconversion.repository.ROOMRepository
 import com.example.currencyconversion.repository.ServerRepository

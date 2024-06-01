@@ -7,6 +7,7 @@ import com.example.currencyconversion.network.server.NetworkResult
 import com.example.currencyconversion.network.server.toResultFlow
 import com.example.currencyconversion.models.ResponseExchangeList
 import com.example.currencyconversion.network.database.CurrencyDataBase
+import com.example.currencyconversion.network.server.API
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -31,7 +32,7 @@ interface LocalDataRepository {
 
 class ServerRepository @Inject constructor(
     @ApplicationContext private val context: android.content.Context,
-    private val api: com.example.currencyconversion.network.server.retrofit.API,
+    private val api: API,
     private val roomRepository:LocalDataRepository,
 ) : ServerDataRepository {
     override suspend fun getServerExchangeRates(apiKey: String): Flow<NetworkResult<ResponseExchangeList>> =

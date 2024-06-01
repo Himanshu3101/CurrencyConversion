@@ -1,4 +1,4 @@
-package com.example.currencyconversion.network.server.retrofit
+package com.example.currencyconversion.network.server
 
 import com.example.currencyconversion.models.Currency
 import com.example.currencyconversion.models.ResponseExchangeList

@@ -13,6 +13,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import  com.example.currencyconversion.models.Currency
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertNull
 
 
@@ -30,7 +31,7 @@ class CurrencyDaoTest {
     }
 
     @Test
-    fun insertRate_expectedList() = runBlocking{
+    fun insertRate_expectedList() = runTest {
         val rateList = listOf(
             Rates("USD", 1.0),
             Rates("INR", 83.460852),
@@ -45,7 +46,7 @@ class CurrencyDaoTest {
     }
 
     @Test
-    fun insertRate_replacesOnConflict() = runBlocking {
+    fun insertRate_replacesOnConflict() = runTest  {
         val initialRates = listOf(
             Rates("USD", 1.0)
         )
@@ -60,7 +61,7 @@ class CurrencyDaoTest {
     }
 
     @Test
-    fun insertCurrency_expectedList() = runBlocking{
+    fun insertCurrency_expectedList() = runTest {
         val currencyList = listOf(
             Currency("USD", "United States Dollar"),
             Currency("INR", "Indian Rupee")
@@ -77,7 +78,7 @@ class CurrencyDaoTest {
     }
 
     @Test
-    fun insertCurrency_replacesOnConflict() = runBlocking {
+    fun insertCurrency_replacesOnConflict() = runTest  {
         val initialCurrency = listOf(
             Currency("USD", "United States Dollar"),
         )
@@ -93,7 +94,7 @@ class CurrencyDaoTest {
     }
 
     @Test
-    fun getRateData_rateCode () = runBlocking{
+    fun getRateData_rateCode () = runTest {
         val rateList = listOf(
             Rates("USD", 1.0),
             Rates("INR", 83.460852),
@@ -104,7 +105,7 @@ class CurrencyDaoTest {
     }
 
     @Test
-    fun getRateData_returnsNullForNonexistentCRateCode() = runBlocking {
+    fun getRateData_returnsNullForNonexistentCRateCode() = runTest  {
         val rateList = listOf(
             Rates("USD", 1.0),
             Rates("INR", 83.460852),
@@ -116,7 +117,7 @@ class CurrencyDaoTest {
     }
 
     @Test
-    fun getRateData_handlesNullRateCode() = runBlocking {
+    fun getRateData_handlesNullRateCode() = runTest  {
         val rateList = listOf(
             Rates("USD", 1.0),
             Rates("INR", 83.460852),
@@ -126,7 +127,7 @@ class CurrencyDaoTest {
     }
 
     @Test
-    fun getCurrencies_list () = runBlocking{
+    fun getCurrencies_list () = runTest {
         val currencyList = listOf(
             Currency("USD", "United States Dollar"),
             Currency("INR", "Indian Rupee")
@@ -140,12 +141,12 @@ class CurrencyDaoTest {
     }
 
     @Test
-    fun getCurrencies_returnsEmptyListWhenNoData() = runBlocking {
+    fun getCurrencies_returnsEmptyListWhenNoData() = runTest  {
         assertEquals(0, currencyDAO.getCurrencies().size)
     }
 
     @Test
-    fun getCurrenciesCount_returnsCorrectCount () = runBlocking{
+    fun getCurrenciesCount_returnsCorrectCount () = runTest {
         val currencyList = listOf(
             Currency("USD", "United States Dollar"),
             Currency("INR", "Indian Rupee")
@@ -155,7 +156,7 @@ class CurrencyDaoTest {
     }
 
     @Test
-    fun getCurrencyCount_returnsZeroWhenNoData() = runBlocking {
+    fun getCurrencyCount_returnsZeroWhenNoData() = runTest  {
         assertEquals(0, currencyDAO.getCurrencyCount())
     }
 

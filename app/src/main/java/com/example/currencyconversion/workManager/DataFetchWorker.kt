@@ -9,7 +9,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.currencyconversion.BuildConfig
 import com.example.currencyconversion.network.di.NetworkModule
-import com.example.currencyconversion.network.server.retrofit.API
+import com.example.currencyconversion.network.server.API
 import com.example.currencyconversion.repository.ServerRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject

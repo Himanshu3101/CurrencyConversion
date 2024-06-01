@@ -101,6 +101,7 @@ dependencies {
     //Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutine_version")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutine_version")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutine_version")
 
     //ROOM
     implementation("androidx.room:room-runtime:$roomVersion")

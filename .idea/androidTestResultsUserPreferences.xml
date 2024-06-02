@@ -208,6 +208,7 @@
               <option name="preferredColumnWidths">
                 <map>
                   <entry key="Duration" value="90" />
+                  <entry key="Google sdk_gphone_x86_64" value="120" />
                   <entry key="Tests" value="360" />
                   <entry key="Xiaomi POCO F1" value="120" />
                 </map>

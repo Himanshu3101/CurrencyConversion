@@ -2,11 +2,11 @@ package com.example.currencyconversion.viewModels
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.ViewModelProvider
+import androidx.test.core.app.ActivityScenario.launch
 import androidx.test.core.app.launchActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.currencyconversion.MainActivity
-import com.example.currencyconversion.models.Currency
-import com.example.currencyconversion.network.di.IoDispatcher
+import com.example.currencyconversion.di.IoDispatcher
 import com.example.currencyconversion.repository.interfaces.LocalDataRepository
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -27,8 +27,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
 import javax.inject.Inject
 import org.mockito.Mockito.`when`
 
@@ -42,29 +42,24 @@ class DataVModelTest {
     var hiltRule = HiltAndroidRule(this)
 
     @get:Rule
-    var instantTaskExecutorRule = InstantTaskExecutorRule()/* = StandardTestDispatcher()*/
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @Inject
     @IoDispatcher
     lateinit var testDispatcher: CoroutineDispatcher
 
-    @Inject
-    lateinit var localDataRepository: LocalDataRepository
-
     private lateinit var viewModel: DataVModel
 
+    @Inject
+    lateinit var mockLocalDataRepository: LocalDataRepository
 
     @Before
     fun setup() {
         hiltRule.inject()
         Dispatchers.setMain(testDispatcher)
 
-        localDataRepository = mock(LocalDataRepository::class.java)
-
-        val scenario = launchActivity<MainActivity>()
-        scenario.onActivity { activity ->
-            viewModel = ViewModelProvider(activity).get(DataVModel::class.java)
-        }
+        mockLocalDataRepository = Mockito.mock(LocalDataRepository::class.java)
+        viewModel = DataVModel(mockLocalDataRepository, testDispatcher)
     }
 
     @After
@@ -75,44 +70,25 @@ class DataVModelTest {
 
     @Test
     fun testIsCurrencyTableEmpty() = runTest(testDispatcher) {
-        `when`(localDataRepository.isCurrencyTableEmpty()).thenReturn(true)
+        `when`(mockLocalDataRepository.isCurrencyTableEmpty()).thenReturn(true)
         val result = viewModel.isCurrencyTableEmpty()
         assertEquals(true, result)
     }
 
     @Test
     fun testGetDBConversionCurrency() = runTest(testDispatcher) {
-        // Given
         val currencyLists = listOf("USD", "EUR", "JPY")
-        `when`(localDataRepository.getAllCurrency()).thenReturn(currencyLists)
-
-        // When
+        `when`(mockLocalDataRepository.getAllCurrency()).thenReturn(currencyLists)
         viewModel.getDBConversionCurrency()
-        advanceUntilIdle()  // Ensures all pending coroutines are executed
-
-
-
-      /*  val currencyLists = listOf("USD", "EUR", "JPY")
-        `when`(localDataRepository.getAllCurrency()).thenReturn(currencyLists)
-//        viewModel.getDBConversionCurrency()
         advanceUntilIdle()
-
-        assertEquals(currencyLists, viewModel.dBConversionCurrency.first())*/
-
-        // Then
-        Assert.assertEquals(currencyLists, viewModel.dBConversionCurrency.first())
+        assertEquals(currencyLists, viewModel.dBConversionCurrency.first())
     }
 
-   /* @Test
-    fun testGetSelectedCurrencyRate() = runTest(testDispatcher) {
-        // Given
-        val rate = 1.23
-        `when`(roomRepository.getAllRates("USD")).thenReturn(rate)
-
-        // When
-        val result = viewModel.getSelectedCurrencyRate("USD")
-
-        // Then
-        Assert.assertEquals(rate, result)
-    }*/
+     @Test
+     fun testGetSelectedCurrencyRate() = runTest(testDispatcher) {
+         val rate = 1.23
+         `when`(mockLocalDataRepository.getAllRates("USD")).thenReturn(rate)
+         val result = viewModel.getSelectedCurrencyRate("USD")
+         Assert.assertEquals(rate, result)
+     }
 }

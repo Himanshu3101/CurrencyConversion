@@ -23,7 +23,6 @@ import com.example.currencyconversion.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -60,7 +59,7 @@ class MainActivity : AppCompatActivity() {
         )
 
 
-        ObserveDBConversionCurrency()
+        observeDBConversionCurrency()
         checkAndFetchData()
 
         activityMainBinding.gridLayout.layoutManager = GridLayoutManager(this, 2)
@@ -123,11 +122,8 @@ class MainActivity : AppCompatActivity() {
                         for (splitCurrency in listOfCurrency) {
                             var currSplitList =
                                 splitCurrency?.let { splitCurrency.split(it.last()) }
-
                             if (currencySplit != null) {
                                 if (currencySplit.equals(currSplitList)) {
-
-
                                     if (currency != splitCurrency) {
                                         targetRate =
                                             viewModel.getSelectedCurrencyRate(splitCurrency)
@@ -136,8 +132,6 @@ class MainActivity : AppCompatActivity() {
                                         }
                                         break
                                     }
-
-
                                 } else {
                                     Log.d(
                                         "MainActivityLog",
@@ -149,35 +143,19 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         result = convertCurrency(inputAmt.toDouble(), baseRate, targetRate)
                     }
-
-//                    conversionResults.add(currency to result)
-//                }
-//
-//
-//                withContext(Dispatchers.Main) {
-//                    conversionListAdapter = ConversionListAdapter(conversionResults)
-//                    activityMainBinding.gridLayout.adapter = conversionListAdapter
-//                }
-
-
                     launch(Dispatchers.Main) {
                         //Result Handl For UI
                         Log.d(
                             "MainActivityLog",
                             "Coversion $inputAmt $selectedCurrency is approximately $result $currency"
                         )
-
-
-//                            conversionListAdapter = ConversionListAdapter()
-//                            activityMainBinding.gridLayout.adapter = conversionListAdapter
-
                     }
                 }
             }
         }
     }
 
-    fun convertCurrency(amount: Double, sourceRate: Double, targetRate: Double): Double {
+    private fun convertCurrency(amount: Double, sourceRate: Double, targetRate: Double): Double {
         return (amount / sourceRate) * targetRate
     }
 
@@ -205,7 +183,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun ObserveDBConversionCurrency() {
+    private fun observeDBConversionCurrency() {
         try {
             lifecycleScope.launch {
                 viewModel.dBConversionCurrency.collect { currency ->

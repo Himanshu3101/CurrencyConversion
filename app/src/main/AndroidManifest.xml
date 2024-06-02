@@ -6,10 +6,10 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
 <!--    android:name=".CurrencyConversion"-->
+<!--    android:name="dagger.hilt.android.testing.HiltTestApplication"-->
     <application
-
         android:allowBackup="true"
-        android:name="dagger.hilt.android.testing.HiltTestApplication"
+        android:name=".CurrencyConversion"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"

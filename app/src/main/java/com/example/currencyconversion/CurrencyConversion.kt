@@ -17,7 +17,7 @@ import dagger.hilt.android.HiltAndroidApp
 import java.util.concurrent.TimeUnit
 
 @HiltAndroidApp
-class CurrencyConversion : MultiDexApplication() {
+class CurrencyConversion : /*MultiDex*/Application() {
 
     override fun onCreate() {
         super.onCreate()

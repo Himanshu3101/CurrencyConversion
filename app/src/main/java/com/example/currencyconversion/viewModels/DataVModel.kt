@@ -1,10 +1,9 @@
 package com.example.currencyconversion.viewModels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.currencyconversion.network.di.IoDispatcher
-import com.example.currencyconversion.repository.ROOMRepository
+import com.example.currencyconversion.di.IoDispatcher
+import com.example.currencyconversion.repository.interfaces.LocalDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DataVModel @Inject constructor(
-    private val roomRepository: ROOMRepository,
+    private val localDataRepository: LocalDataRepository,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
@@ -24,18 +23,12 @@ class DataVModel @Inject constructor(
     val dBConversionCurrency: StateFlow<List<String?>> = _dBConversionCurrency
 
     suspend fun isCurrencyTableEmpty(): Boolean {
-//        return roomRepository.isCurrencyTableEmpty()
-        return if (roomRepository.isCurrencyTableEmpty() == null) {
-            // Handle the case where the LiveData object is null
-            true
-        } else {
-            return roomRepository.isCurrencyTableEmpty()
-        }
+        return localDataRepository.isCurrencyTableEmpty() ?: true
     }
 
     fun getDBConversionCurrency() {
         viewModelScope.launch(dispatcher) {
-            val currency = roomRepository.getAllCurrency()
+            val currency = localDataRepository.getAllCurrency()
             withContext(Dispatchers.Main) {
                 _dBConversionCurrency.value = emptyList()
                 _dBConversionCurrency.value = currency
@@ -44,7 +37,7 @@ class DataVModel @Inject constructor(
     }
 
     suspend fun getSelectedCurrencyRate(currencyCountry: String?): Double? {
-             return roomRepository.getAllRates(currencyCountry)
+             return localDataRepository.getAllRates(currencyCountry)
     }
 
 }

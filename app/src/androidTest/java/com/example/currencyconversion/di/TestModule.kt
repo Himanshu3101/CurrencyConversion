@@ -1,16 +1,13 @@
-package com.example.currencyconversion.viewModels
+package com.example.currencyconversion.di
 
-import com.example.currencyconversion.network.di.CoroutineDispatcherModule
-import com.example.currencyconversion.network.di.IoDispatcher
-import com.example.currencyconversion.repository.ROOMRepository
-import com.example.currencyconversion.repository.interfaces.LocalDataRepository
+import com.example.currencyconversion.di.CoroutineDispatcherModule
+import com.example.currencyconversion.di.IoDispatcher
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.test.StandardTestDispatcher
-import org.mockito.Mockito.mock
 
 
 @TestInstallIn(
@@ -23,10 +20,5 @@ object TestModule {
     @IoDispatcher
     fun provideTestDispatcher(): CoroutineDispatcher {
         return StandardTestDispatcher()
-    }
-
-    @Provides
-    fun provideRoomRepository(): ROOMRepository {
-        return mock(ROOMRepository::class.java)
     }
 }

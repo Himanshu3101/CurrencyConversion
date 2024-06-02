@@ -1,4 +1,4 @@
-package com.example.currencyconversion.network.di
+package com.example.currencyconversion.di
 
 import android.content.Context
 import androidx.room.Room

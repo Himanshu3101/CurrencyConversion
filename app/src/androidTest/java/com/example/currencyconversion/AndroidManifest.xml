@@ -1,0 +1,15 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="your.package.name.test">
+
+    <application
+        android:label="Test Application">
+    </application>
+
+    <instrumentation
+        android:name="com.example.currencyconversion.viewModels.CustomTestRunner"
+        android:functionalTest="false"
+        android:handleProfiling="false"
+        android:label="Tests for YourAppName"
+        android:targetPackage="com.example.currencyconversion" />
+
+</manifest>

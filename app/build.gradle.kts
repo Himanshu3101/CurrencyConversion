@@ -26,6 +26,7 @@ android {
         buildConfigField("String", "API_KEY", properties.getProperty("API_KEY"))
     }
 
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -75,8 +76,8 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation ("androidx.test:runner:1.5.2")
-    androidTestImplementation ("androidx.test:rules:1.5.0")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation ("androidx.test:rules:1.5.0")
 
     testImplementation("androidx.room:room-testing:$roomVersion")
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
@@ -93,17 +94,14 @@ dependencies {
 
     // Hilt
     implementation("com.google.dagger:hilt-android:$hilt_version")
+    kaptAndroidTest ("com.google.dagger:hilt-android-compiler:2.49")
     implementation("androidx.hilt:hilt-work:$hilt_work")
-    kapt("com.google.dagger:hilt-android-compiler:$hilt_version")
     kapt("androidx.hilt:hilt-compiler:$hilt_work")
     kapt("com.google.dagger:hilt-compiler:$hilt_version")
     implementation("androidx.work:work-runtime-ktx:2.9.0")
-    //For testing
     androidTestImplementation ("com.google.dagger:hilt-android-testing:2.40.5@aar")
-    kaptAndroidTest ("com.google.dagger:hilt-android-compiler:2.49")
-//    testImplementation ("com.google.dagger:hilt-android-testing:2.40.5")
-//    androidTestImplementation ("androidx.hilt:hilt-lifecycle-viewmodel-testing:2.40.5@aar")
-//    androidTestImplementation ("dagger.hilt.android.testing:hilt-android-testing:2.40.5")
+
+
 
 
     //Lifecycle

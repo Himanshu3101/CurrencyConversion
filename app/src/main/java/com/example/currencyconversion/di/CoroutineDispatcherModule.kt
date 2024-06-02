@@ -1,4 +1,4 @@
-package com.example.currencyconversion.network.di
+package com.example.currencyconversion.di
 
 import dagger.Module
 import dagger.Provides

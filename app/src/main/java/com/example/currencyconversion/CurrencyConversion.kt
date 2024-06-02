@@ -2,6 +2,7 @@ package com.example.currencyconversion
 
 import android.app.Application
 import android.util.Log
+import androidx.multidex.MultiDexApplication
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -16,7 +17,7 @@ import dagger.hilt.android.HiltAndroidApp
 import java.util.concurrent.TimeUnit
 
 @HiltAndroidApp
-class CurrencyConversion : Application() {
+class CurrencyConversion : MultiDexApplication() {
 
     override fun onCreate() {
         super.onCreate()

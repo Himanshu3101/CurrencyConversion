@@ -16,11 +16,14 @@ import android.widget.ArrayAdapter
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.recyclerview.widget.GridLayoutManager
+import com.example.currencyconversion.adapter.ConversionListAdapter
 import com.example.currencyconversion.viewModels.DataVModel
 import com.example.currencyconversion.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -29,6 +32,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var activityMainBinding: ActivityMainBinding
     lateinit var listOfCurrency: List<String?>
     var selectedCurrency: String = "Selected Currency"
+    lateinit var conversionListAdapter: ConversionListAdapter
 
     private val dataUpdateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -58,6 +62,8 @@ class MainActivity : AppCompatActivity() {
 
         ObserveDBConversionCurrency()
         checkAndFetchData()
+
+        activityMainBinding.gridLayout.layoutManager = GridLayoutManager(this, 2)
 
         activityMainBinding.spinnerCurrency.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
@@ -105,33 +111,34 @@ class MainActivity : AppCompatActivity() {
             lifecycleScope.launch(Dispatchers.IO) {
                 val baseRate = viewModel.getSelectedCurrencyRate(selectedCurrency).toString().toDouble()
 
-                var targetRate: Double? = 0.0
-                var result: Double? = 0.0
+                val conversionResults = mutableListOf<Pair<String, Double?>>()
 
                 for (currency in listOfCurrency) {
-                    targetRate = viewModel.getSelectedCurrencyRate(currency)
+                    var targetRate = viewModel.getSelectedCurrencyRate(currency)
+                    var result: Double? = null
 
                     if (targetRate == null) {
                         var currencySplit = currency?.let { currency.split(it.last()) }
 
                         for (splitCurrency in listOfCurrency) {
-                            var currSplitList = splitCurrency?.let { splitCurrency.split(it.last()) }
+                            var currSplitList =
+                                splitCurrency?.let { splitCurrency.split(it.last()) }
 
                             if (currencySplit != null) {
                                 if (currencySplit.equals(currSplitList)) {
 
 
-
-                                    if(currency!=splitCurrency){
-                                        targetRate = viewModel.getSelectedCurrencyRate(splitCurrency)
+                                    if (currency != splitCurrency) {
+                                        targetRate =
+                                            viewModel.getSelectedCurrencyRate(splitCurrency)
                                         result = targetRate?.let {
                                             convertCurrency(inputAmt.toDouble(), baseRate, it)
                                         }
+                                        break
                                     }
 
 
-
-                                }else{
+                                } else {
                                     Log.d(
                                         "MainActivityLog",
                                         "Don't have any approximate conversion using available exchange rates of related or newer versions of the currency"
@@ -142,12 +149,28 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         result = convertCurrency(inputAmt.toDouble(), baseRate, targetRate)
                     }
+
+//                    conversionResults.add(currency to result)
+//                }
+//
+//
+//                withContext(Dispatchers.Main) {
+//                    conversionListAdapter = ConversionListAdapter(conversionResults)
+//                    activityMainBinding.gridLayout.adapter = conversionListAdapter
+//                }
+
+
                     launch(Dispatchers.Main) {
                         //Result Handl For UI
                         Log.d(
                             "MainActivityLog",
                             "Coversion $inputAmt $selectedCurrency is approximately $result $currency"
                         )
+
+
+//                            conversionListAdapter = ConversionListAdapter()
+//                            activityMainBinding.gridLayout.adapter = conversionListAdapter
+
                     }
                 }
             }

@@ -21,6 +21,9 @@
           <timeTargetWasSelectedWithDropDown value="2024-05-17T08:53:18.646479900Z" />
         </State>
       </entry>
+      <entry key="testGetSelectedCurrencyRate()">
+        <State />
+      </entry>
       <entry key="testIsCurrencyTableEmpty()">
         <State />
       </entry>

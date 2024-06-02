@@ -3,6 +3,7 @@ package com.example.currencyconversion.viewModels
 import com.example.currencyconversion.network.di.CoroutineDispatcherModule
 import com.example.currencyconversion.network.di.IoDispatcher
 import com.example.currencyconversion.repository.ROOMRepository
+import com.example.currencyconversion.repository.interfaces.LocalDataRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent

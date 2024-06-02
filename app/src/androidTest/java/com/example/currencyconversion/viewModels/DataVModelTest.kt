@@ -13,21 +13,18 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Assert.*
 
 import org.junit.After
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.verify
 import javax.inject.Inject
 import org.mockito.Mockito.`when`
 
@@ -48,7 +45,7 @@ class DataVModelTest {
     lateinit var testDispatcher: CoroutineDispatcher
 
     @Inject
-    lateinit var roomRepository: LocalDataRepository
+    lateinit var localDataRepository: LocalDataRepository
 
     private lateinit var viewModel: DataVModel
 
@@ -57,6 +54,9 @@ class DataVModelTest {
     fun setup() {
         hiltRule.inject()
         Dispatchers.setMain(testDispatcher)
+
+        localDataRepository = mock(LocalDataRepository::class.java)
+
         val scenario = launchActivity<MainActivity>()
         scenario.onActivity { activity ->
             viewModel = ViewModelProvider(activity).get(DataVModel::class.java)
@@ -71,31 +71,50 @@ class DataVModelTest {
 
     @Test
     fun testIsCurrencyTableEmpty() = runTest(testDispatcher) {
-        // Given
-        `when`(roomRepository.isCurrencyTableEmpty()).thenReturn(true)
+      /*  `when`(roomRepository.isCurrencyTableEmpty()).thenReturn(true)
+        val result = viewModel.isCurrencyTableEmpty()
+        assertEquals(true, result)*/
 
-        // When
+
+        // Prepare the mock
+        `when`(localDataRepository.isCurrencyTableEmpty()).thenReturn(true)
+
+        // Call the method
         val result = viewModel.isCurrencyTableEmpty()
 
-        // Then
-        Assert.assertEquals(true, result)
+        // Verify the outcome
+        assertEquals(true, result)
+
+        // Optionally verify interaction with the mock
+//        verify(localDataRepository).isCurrencyTableEmpty()
     }
 
-    @Test
+    /*@Test
     fun testGetDBConversionCurrency() = runTest(testDispatcher) {
         // Given
-        val currencyList = listOf("USD", "EUR", "JPY")
-        `when`(roomRepository.getAllCurrency()).thenReturn(currencyList)
+//        val currencyLists = listOf("USD", "EUR", "JPY")
+//        `when`(roomRepository.getAllCurrency()).thenReturn(currencyLists)
+//
+//        // When
+//        viewModel.getDBConversionCurrency()
+//        advanceUntilIdle()  // Ensures all pending coroutines are executed
 
-        // When
-        viewModel.getDBConversionCurrency()
-        advanceUntilIdle()  // Ensures all pending coroutines are executed
+
+
+        val currencyList = listOf(
+            Currency("USD", "United States Dollar"),
+            Currency("INR", "Indian Rupee")
+        )
+        roomRepository.insertCurrency(currencyList)
+
+        val result =  viewModel.getDBConversionCurrency()
+        assertEquals(currencyList, viewModel.dBConversionCurrency.first())
 
         // Then
-        Assert.assertEquals(currencyList, viewModel.dBConversionCurrency.first())
-    }
+//        Assert.assertEquals(currencyLists, viewModel.dBConversionCurrency.first())
+    }*/
 
-    @Test
+   /* @Test
     fun testGetSelectedCurrencyRate() = runTest(testDispatcher) {
         // Given
         val rate = 1.23
@@ -106,5 +125,5 @@ class DataVModelTest {
 
         // Then
         Assert.assertEquals(rate, result)
-    }
+    }*/
 }

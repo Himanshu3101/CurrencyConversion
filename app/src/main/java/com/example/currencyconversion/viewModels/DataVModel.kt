@@ -24,7 +24,13 @@ class DataVModel @Inject constructor(
     val dBConversionCurrency: StateFlow<List<String?>> = _dBConversionCurrency
 
     suspend fun isCurrencyTableEmpty(): Boolean {
-        return roomRepository.isCurrencyTableEmpty()
+//        return roomRepository.isCurrencyTableEmpty()
+        return if (roomRepository.isCurrencyTableEmpty() == null) {
+            // Handle the case where the LiveData object is null
+            true
+        } else {
+            return roomRepository.isCurrencyTableEmpty()
+        }
     }
 
     fun getDBConversionCurrency() {

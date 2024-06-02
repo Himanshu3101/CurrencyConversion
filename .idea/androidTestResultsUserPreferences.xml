@@ -74,8 +74,11 @@
               <option name="preferredColumnWidths">
                 <map>
                   <entry key="Duration" value="90" />
+                  <entry key="Genymobile Pixel 8" value="120" />
                   <entry key="Google sdk_gphone_x86_64" value="120" />
+                  <entry key="Pixel_3a_API_34" value="120" />
                   <entry key="Tests" value="360" />
+                  <entry key="Xiaomi POCO F1" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>
@@ -89,6 +92,7 @@
                   <entry key="Duration" value="90" />
                   <entry key="Google sdk_gphone_x86_64" value="120" />
                   <entry key="Tests" value="360" />
+                  <entry key="Xiaomi POCO F1" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>
@@ -193,6 +197,19 @@
                   <entry key="Duration" value="90" />
                   <entry key="Google sdk_gphone_x86_64" value="120" />
                   <entry key="Tests" value="360" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
+        <entry key="1955942609">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="Xiaomi POCO F1" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>

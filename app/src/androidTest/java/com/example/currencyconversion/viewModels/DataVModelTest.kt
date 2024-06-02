@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.test.core.app.launchActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.currencyconversion.MainActivity
+import com.example.currencyconversion.models.Currency
 import com.example.currencyconversion.network.di.IoDispatcher
 import com.example.currencyconversion.repository.interfaces.LocalDataRepository
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -13,12 +14,15 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Assert.*
 
 import org.junit.After
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -71,48 +75,33 @@ class DataVModelTest {
 
     @Test
     fun testIsCurrencyTableEmpty() = runTest(testDispatcher) {
-      /*  `when`(roomRepository.isCurrencyTableEmpty()).thenReturn(true)
-        val result = viewModel.isCurrencyTableEmpty()
-        assertEquals(true, result)*/
-
-
-        // Prepare the mock
         `when`(localDataRepository.isCurrencyTableEmpty()).thenReturn(true)
-
-        // Call the method
         val result = viewModel.isCurrencyTableEmpty()
-
-        // Verify the outcome
         assertEquals(true, result)
-
-        // Optionally verify interaction with the mock
-//        verify(localDataRepository).isCurrencyTableEmpty()
     }
 
-    /*@Test
+    @Test
     fun testGetDBConversionCurrency() = runTest(testDispatcher) {
         // Given
-//        val currencyLists = listOf("USD", "EUR", "JPY")
-//        `when`(roomRepository.getAllCurrency()).thenReturn(currencyLists)
-//
-//        // When
+        val currencyLists = listOf("USD", "EUR", "JPY")
+        `when`(localDataRepository.getAllCurrency()).thenReturn(currencyLists)
+
+        // When
+        viewModel.getDBConversionCurrency()
+        advanceUntilIdle()  // Ensures all pending coroutines are executed
+
+
+
+      /*  val currencyLists = listOf("USD", "EUR", "JPY")
+        `when`(localDataRepository.getAllCurrency()).thenReturn(currencyLists)
 //        viewModel.getDBConversionCurrency()
-//        advanceUntilIdle()  // Ensures all pending coroutines are executed
+        advanceUntilIdle()
 
-
-
-        val currencyList = listOf(
-            Currency("USD", "United States Dollar"),
-            Currency("INR", "Indian Rupee")
-        )
-        roomRepository.insertCurrency(currencyList)
-
-        val result =  viewModel.getDBConversionCurrency()
-        assertEquals(currencyList, viewModel.dBConversionCurrency.first())
+        assertEquals(currencyLists, viewModel.dBConversionCurrency.first())*/
 
         // Then
-//        Assert.assertEquals(currencyLists, viewModel.dBConversionCurrency.first())
-    }*/
+        Assert.assertEquals(currencyLists, viewModel.dBConversionCurrency.first())
+    }
 
    /* @Test
     fun testGetSelectedCurrencyRate() = runTest(testDispatcher) {

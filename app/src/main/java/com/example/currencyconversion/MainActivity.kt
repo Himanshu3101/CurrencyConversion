@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
 
         activityMainBinding.editTextAmount.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                currencyCalculation(s.toString(), "INR")
+                currencyCalculation(s.toString(),   selectedCurrency)
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -106,6 +106,7 @@ class MainActivity : AppCompatActivity() {
 
     fun currencyCalculation(inputAmt: String, selectedCurrency: String) {
         // To do Calculation. Here.,
+        Log.d("MainActivityLog", selectedCurrency)
         if (inputAmt.isNotEmpty() && selectedCurrency != "Selected Currency") {
             lifecycleScope.launch(Dispatchers.IO) {
                 val baseRate = viewModel.getSelectedCurrencyRate(selectedCurrency).toString().toDouble()

@@ -69,14 +69,14 @@ class DataVModelTest {
     }
 
     @Test
-    fun testIsCurrencyTableEmpty() = runTest(testDispatcher) {
+    fun test_IsCurrencyTableEmpty() = runTest(testDispatcher) {
         `when`(mockLocalDataRepository.isCurrencyTableEmpty()).thenReturn(true)
         val result = viewModel.isCurrencyTableEmpty()
         assertEquals(true, result)
     }
 
     @Test
-    fun testGetDBConversionCurrency() = runTest(testDispatcher) {
+    fun test_GetDBConversionCurrency() = runTest(testDispatcher) {
         val currencyLists = listOf("USD", "EUR", "JPY")
         `when`(mockLocalDataRepository.getAllCurrency()).thenReturn(currencyLists)
         viewModel.getDBConversionCurrency()
@@ -85,7 +85,7 @@ class DataVModelTest {
     }
 
      @Test
-     fun testGetSelectedCurrencyRate() = runTest(testDispatcher) {
+     fun test_GetSelectedCurrencyRate() = runTest(testDispatcher) {
          val rate = 1.23
          `when`(mockLocalDataRepository.getAllRates("USD")).thenReturn(rate)
          val result = viewModel.getSelectedCurrencyRate("USD")

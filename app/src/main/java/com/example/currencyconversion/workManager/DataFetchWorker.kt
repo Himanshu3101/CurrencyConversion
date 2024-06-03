@@ -13,6 +13,7 @@ import com.example.currencyconversion.network.server.API
 import com.example.currencyconversion.repository.ServerRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CoroutineDispatcher
 
 
 @HiltWorker
@@ -28,7 +29,9 @@ class DataFetchWorker @AssistedInject constructor(
             val remoteDataSource = NetworkModule.provideRetrofit().create(API::class.java)
             val currencyDB = NetworkModule.provideDatabase(context)
             val roomRepository= NetworkModule.provideDataRepository(currencyDB)
-            val exchangeRate = ServerRepository(context, remoteDataSource, roomRepository)
+            val dispatcher = NetworkModule.provideDispatcher()
+            val networkConnectivity = NetworkModule.provideNetworkConnectivity(context)
+            val exchangeRate = ServerRepository(context, remoteDataSource, roomRepository, dispatcher, networkConnectivity)
 
             exchangeRate.getServerExchangeRates(BuildConfig.API_KEY).collect { result ->
                 result.data?.let {

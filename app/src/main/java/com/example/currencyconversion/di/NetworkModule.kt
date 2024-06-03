@@ -8,11 +8,14 @@ import com.example.currencyconversion.network.server.API
 import com.example.currencyconversion.repository.ROOMRepository
 import com.example.currencyconversion.repository.ServerRepository
 import com.example.currencyconversion.repository.interfaces.LocalDataRepository
+import com.example.currencyconversion.utils.NetworkConnectivityImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -43,8 +46,20 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideServerRepository(@ApplicationContext context: Context, remoteDataSource: API, roomRepository: LocalDataRepository): ServerRepository {
-        return ServerRepository(context,remoteDataSource, roomRepository)
+    fun provideServerRepository(
+        @ApplicationContext context: Context,
+        remoteDataSource: API,
+        roomRepository: LocalDataRepository,
+        dispatcher: CoroutineDispatcher,
+        networkConnectivity: NetworkConnectivityImpl
+    ): ServerRepository {
+        return ServerRepository(
+            context,
+            remoteDataSource,
+            roomRepository,
+            dispatcher,
+            networkConnectivity
+        )
     }
 
     @Provides
@@ -56,4 +71,16 @@ object NetworkModule {
     fun provideDataRepository(currencyDataBase: CurrencyDataBase): LocalDataRepository {
         return ROOMRepository(currencyDataBase)
     }
+
+    @Provides
+    fun provideDispatcher(): CoroutineDispatcher {
+        return Dispatchers.IO
+    }
+
+    @Provides
+    fun provideNetworkConnectivity(@ApplicationContext context: Context): NetworkConnectivityImpl {
+        return NetworkConnectivityImpl(context)
+    }
+
+
 }

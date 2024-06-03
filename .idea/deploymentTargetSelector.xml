@@ -8,13 +8,10 @@
       <SelectionState runConfigName="DataVModelTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="testIsCurrencyTableEmpty()">
+      <SelectionState runConfigName="test_getServerExchangeRates_success()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="testGetDBConversionCurrency()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="testGetSelectedCurrencyRate()">
+      <SelectionState runConfigName="ServerRepositoryTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

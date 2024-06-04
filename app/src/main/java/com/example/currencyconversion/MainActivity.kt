@@ -20,9 +20,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.currencyconversion.adapter.ConversionListAdapter
 import com.example.currencyconversion.viewModels.DataVModel
 import com.example.currencyconversion.databinding.ActivityMainBinding
+import com.example.currencyconversion.models.EndResult
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -31,7 +33,10 @@ class MainActivity : AppCompatActivity() {
     lateinit var activityMainBinding: ActivityMainBinding
     lateinit var listOfCurrency: List<String?>
     var selectedCurrency: String = "Selected Currency"
+
     lateinit var conversionListAdapter: ConversionListAdapter
+     var resultList: ArrayList<EndResult> = ArrayList()
+
 
     private val dataUpdateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -53,6 +58,14 @@ class MainActivity : AppCompatActivity() {
         activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(activityMainBinding.root)
 
+
+
+
+        activityMainBinding.recyclerView.layoutManager = GridLayoutManager(this, 2)
+        conversionListAdapter = ConversionListAdapter(resultList)
+        activityMainBinding.recyclerView.adapter = conversionListAdapter
+
+
         LocalBroadcastManager.getInstance(this).registerReceiver(
             dataUpdateReceiver,
             IntentFilter("com.example.UPDATE_DATA")
@@ -61,8 +74,6 @@ class MainActivity : AppCompatActivity() {
 
         observeDBConversionCurrency()
         checkAndFetchData()
-
-        activityMainBinding.gridLayout.layoutManager = GridLayoutManager(this, 2)
 
         activityMainBinding.spinnerCurrency.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
@@ -89,7 +100,7 @@ class MainActivity : AppCompatActivity() {
 
         activityMainBinding.editTextAmount.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                currencyCalculation(s.toString(),   selectedCurrency)
+                currencyCalculation(s.toString(), selectedCurrency)
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -109,9 +120,10 @@ class MainActivity : AppCompatActivity() {
         Log.d("MainActivityLog", selectedCurrency)
         if (inputAmt.isNotEmpty() && selectedCurrency != "Selected Currency") {
             lifecycleScope.launch(Dispatchers.IO) {
-                val baseRate = viewModel.getSelectedCurrencyRate(selectedCurrency).toString().toDouble()
+                val baseRate =
+                    viewModel.getSelectedCurrencyRate(selectedCurrency).toString().toDouble()
 
-                val conversionResults = mutableListOf<Pair<String, Double?>>()
+                val conversionResults = mutableListOf<EndResult>()
 
                 for (currency in listOfCurrency) {
                     var targetRate = viewModel.getSelectedCurrencyRate(currency)
@@ -144,14 +156,18 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         result = convertCurrency(inputAmt.toDouble(), baseRate, targetRate)
                     }
-                    launch(Dispatchers.Main) {
-                        //Result Handl For UI
-                        Log.d(
-                            "MainActivityLog",
-                            "Coversion $inputAmt $selectedCurrency is approximately $result $currency"
-                        )
-                    }
+                    conversionResults.add(EndResult(result, currency))
                 }
+//                Log.d(
+//                    "MainActivityLog",
+//                    "Coversion $inputAmt $selectedCurrency is approximately $result $currency"
+//                )
+                withContext(Dispatchers.Main) {
+                    resultList.clear()
+                    resultList.addAll(conversionResults)
+                    conversionListAdapter.notifyDataSetChanged()
+                }
+
             }
         }
     }

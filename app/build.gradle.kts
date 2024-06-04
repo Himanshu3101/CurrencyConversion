@@ -98,10 +98,11 @@ dependencies {
     implementation("androidx.hilt:hilt-work:$hilt_work")
     kapt("androidx.hilt:hilt-compiler:$hilt_work")
     kapt("com.google.dagger:hilt-compiler:$hilt_version")
-    implementation("androidx.work:work-runtime-ktx:2.9.0")
     androidTestImplementation ("com.google.dagger:hilt-android-testing:2.40.5@aar")
 
-
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+    androidTestImplementation ("androidx.work:work-testing:2.7.1")
+    androidTestImplementation ("com.google.truth:truth:1.1.3")
 
 
     //Lifecycle
@@ -116,7 +117,6 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:$okhttp_version")
     implementation("com.google.code.gson:gson:$gson_version")
 
-
     //Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutine_version")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutine_version")
@@ -129,7 +129,6 @@ dependencies {
     implementation("androidx.room:room-runtime:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
-
 
     // Mockito for mocking
     testImplementation ("org.mockito:mockito-core:4.0.0")

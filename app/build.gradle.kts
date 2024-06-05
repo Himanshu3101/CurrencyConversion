@@ -37,15 +37,22 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        /* sourceCompatibility = JavaVersion.VERSION_1_8
+         targetCompatibility = JavaVersion.VERSION_1_8*/
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"/*"1.8"*/
     }
     buildFeatures {
         buildConfig = true
         viewBinding = true
+    }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources  = true
+        }
     }
 }
 
@@ -53,12 +60,17 @@ android {
 
 dependencies {
 
-    implementation ("androidx.multidex:multidex:2.0.1@aar")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.20")
+
+
+    implementation("androidx.multidex:multidex:2.0.1@aar")
     implementation("androidx.annotation:annotation:1.8.0")
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation("androidx.gridlayout:gridlayout:1.0.0")
     implementation("androidx.test:core-ktx:1.5.0")
     implementation("androidx.test.ext:junit-ktx:1.1.5")
+    implementation("androidx.test.espresso:espresso-contrib:3.5.1")
+
     val hilt_version = "2.49"
     val hilt_work = "1.2.0"
     val lifecycle_version = "2.8.1"
@@ -74,10 +86,6 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation ("androidx.test:runner:1.5.2")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation ("androidx.test:rules:1.5.0")
 
     testImplementation("androidx.room:room-testing:$roomVersion")
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
@@ -85,24 +93,29 @@ dependencies {
     androidTestImplementation("androidx.arch.core:core-testing:2.2.0")
 
     // AndroidX Test - Core & Rules
-    androidTestImplementation ("androidx.test:core:1.5.0")
-    androidTestImplementation ("androidx.test:runner:1.5.2")
-    androidTestImplementation ("androidx.test:rules:1.5.0")
+    androidTestImplementation("androidx.test:core:1.5.0")
+    androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestImplementation("androidx.test:rules:1.5.0")
 
-    // AndroidX Test - Ext
-    androidTestImplementation ("androidx.test.ext:junit:1.1.5")
+
+    // AndroidX Test -
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
+
 
     // Hilt
     implementation("com.google.dagger:hilt-android:$hilt_version")
-    kaptAndroidTest ("com.google.dagger:hilt-android-compiler:2.49")
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:$hilt_version")
     implementation("androidx.hilt:hilt-work:$hilt_work")
     kapt("androidx.hilt:hilt-compiler:$hilt_work")
     kapt("com.google.dagger:hilt-compiler:$hilt_version")
-    androidTestImplementation ("com.google.dagger:hilt-android-testing:2.40.5@aar")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.40.5@aar")
 
     implementation("androidx.work:work-runtime-ktx:2.9.0")
-    androidTestImplementation ("androidx.work:work-testing:2.7.1")
-    androidTestImplementation ("com.google.truth:truth:1.1.3")
+    androidTestImplementation("androidx.work:work-testing:2.9.0")
+    androidTestImplementation("com.google.truth:truth:1.1.3")
+    androidTestImplementation("androidx.test.ext:truth:1.5.0")
 
 
     //Lifecycle
@@ -123,7 +136,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutine_version")
 
     // Coroutines test library
-    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
 
     //ROOM
     implementation("androidx.room:room-runtime:$roomVersion")
@@ -131,10 +144,17 @@ dependencies {
     implementation("androidx.room:room-ktx:$roomVersion")
 
     // Mockito for mocking
-    testImplementation ("org.mockito:mockito-core:4.0.0")
-    testImplementation ("org.mockito:mockito-inline:4.0.0")
-    androidTestImplementation ("org.mockito:mockito-android:4.0.0")
+    testImplementation("org.mockito:mockito-core:4.0.0")
+    testImplementation("org.mockito:mockito-inline:4.0.0")
+    androidTestImplementation("org.mockito:mockito-android:4.0.0")
 
     // Mockito Kotlin
-    testImplementation ("org.mockito.kotlin:mockito-kotlin:4.0.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
+
+    //Robolectric
+    testImplementation("org.robolectric:robolectric:4.12.2")
+    testImplementation("androidx.test:core:1.5.0")
+    testImplementation("androidx.test.ext:junit:1.1.5")
+    testImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    testImplementation ("androidx.work:work-testing:2.9.0")
 }

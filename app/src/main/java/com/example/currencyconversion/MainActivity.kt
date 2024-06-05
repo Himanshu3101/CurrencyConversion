@@ -20,11 +20,14 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.currencyconversion.adapter.ConversionListAdapter
 import com.example.currencyconversion.viewModels.DataVModel
 import com.example.currencyconversion.databinding.ActivityMainBinding
+import com.example.currencyconversion.di.IoDispatcher
 import com.example.currencyconversion.models.EndResult
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -35,7 +38,12 @@ class MainActivity : AppCompatActivity() {
     var selectedCurrency: String = "Selected Currency"
 
     lateinit var conversionListAdapter: ConversionListAdapter
-     var resultList: ArrayList<EndResult> = ArrayList()
+    var resultList: ArrayList<EndResult> = ArrayList()
+
+
+    @Inject
+    @IoDispatcher
+    lateinit var dispatcher: CoroutineDispatcher
 
 
     private val dataUpdateReceiver = object : BroadcastReceiver() {
@@ -58,19 +66,14 @@ class MainActivity : AppCompatActivity() {
         activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(activityMainBinding.root)
 
-
-
-
-        activityMainBinding.recyclerView.layoutManager = GridLayoutManager(this, 2)
+        activityMainBinding.recyclerView.layoutManager = GridLayoutManager(this, 3)
         conversionListAdapter = ConversionListAdapter(resultList)
         activityMainBinding.recyclerView.adapter = conversionListAdapter
-
 
         LocalBroadcastManager.getInstance(this).registerReceiver(
             dataUpdateReceiver,
             IntentFilter("com.example.UPDATE_DATA")
         )
-
 
         observeDBConversionCurrency()
         checkAndFetchData()
@@ -95,7 +98,6 @@ class MainActivity : AppCompatActivity() {
                 override fun onNothingSelected(parent: AdapterView<*>?) {
                     TODO("Not yet implemented")
                 }
-
             }
 
         activityMainBinding.editTextAmount.addTextChangedListener(object : TextWatcher {
@@ -116,10 +118,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun currencyCalculation(inputAmt: String, selectedCurrency: String) {
-        // To do Calculation. Here.,
-        Log.d("MainActivityLog", selectedCurrency)
         if (inputAmt.isNotEmpty() && selectedCurrency != "Selected Currency") {
-            lifecycleScope.launch(Dispatchers.IO) {
+            lifecycleScope.launch(dispatcher) {
                 val baseRate =
                     viewModel.getSelectedCurrencyRate(selectedCurrency).toString().toDouble()
 
@@ -156,21 +156,26 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         result = convertCurrency(inputAmt.toDouble(), baseRate, targetRate)
                     }
+                    Log.d(
+                        "MainActivityLog",
+                        "Coversion $inputAmt $selectedCurrency is approximately $result $currency"
+                    )
                     conversionResults.add(EndResult(result, currency))
                 }
-//                Log.d(
-//                    "MainActivityLog",
-//                    "Coversion $inputAmt $selectedCurrency is approximately $result $currency"
-//                )
                 withContext(Dispatchers.Main) {
                     resultList.clear()
                     resultList.addAll(conversionResults)
                     conversionListAdapter.notifyDataSetChanged()
+
                 }
 
             }
+        } else {
+            Log.e("currencyCalculation", "Amount is null or blank")
+            return
         }
     }
+
 
     private fun convertCurrency(amount: Double, sourceRate: Double, targetRate: Double): Double {
         return (amount / sourceRate) * targetRate

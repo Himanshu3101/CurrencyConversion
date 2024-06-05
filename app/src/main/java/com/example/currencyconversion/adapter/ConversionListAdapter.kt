@@ -30,8 +30,8 @@ class ConversionListAdapter(private val resultList: List<EndResult>) : RecyclerV
     }
 
     inner class ConversionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val currencyTextView: TextView = itemView.findViewById(R.id.currencyTextView)
-        private val resultTextView: TextView = itemView.findViewById(R.id.resultTextView)
+        val currencyTextView: TextView = itemView.findViewById(R.id.currencyTextView)
+        val resultTextView: TextView = itemView.findViewById(R.id.resultTextView)
 
         fun bind(endResult: EndResult) {
             currencyTextView.text = endResult.currency

@@ -14,7 +14,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class DataVModel @Inject constructor(
+open class DataVModel @Inject constructor(
     private val localDataRepository: LocalDataRepository,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
@@ -26,7 +26,7 @@ class DataVModel @Inject constructor(
         return localDataRepository.isCurrencyTableEmpty() ?: true
     }
 
-    fun getDBConversionCurrency() {
+    open suspend fun getDBConversionCurrency() {
         viewModelScope.launch(dispatcher) {
             val currency = localDataRepository.getAllCurrency()
             withContext(Dispatchers.Main) {
@@ -36,8 +36,13 @@ class DataVModel @Inject constructor(
         }
     }
 
-    suspend fun getSelectedCurrencyRate(currencyCountry: String?): Double? {
-             return localDataRepository.getAllRates(currencyCountry)
+    open suspend fun getSelectedCurrencyRate(currencyCountry: String?): Double? {
+//             return localDataRepository.getAllRates(currencyCountry)
+        return withContext(dispatcher) {
+            localDataRepository.getAllRates(currencyCountry)
+        }
     }
 
 }
+
+//Attempt to invoke interface method 'java.lang.Object kotlin.coroutines.CoroutineContext.fold(java.lang.Object, kotlin.jvm.functions.Function2)' on a null object reference

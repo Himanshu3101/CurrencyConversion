@@ -1,11 +1,7 @@
 package com.example.currencyconversion.viewModels
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.ViewModelProvider
-import androidx.test.core.app.ActivityScenario.launch
-import androidx.test.core.app.launchActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.currencyconversion.MainActivity
 import com.example.currencyconversion.di.IoDispatcher
 import com.example.currencyconversion.repository.interfaces.LocalDataRepository
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -19,18 +15,16 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.junit.Assert.*
-
 import org.junit.After
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
-import org.mockito.Mockito.mock
-import javax.inject.Inject
 import org.mockito.Mockito.`when`
+import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
 @HiltAndroidTest

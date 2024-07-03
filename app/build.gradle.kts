@@ -37,8 +37,6 @@ android {
         }
     }
     compileOptions {
-        /* sourceCompatibility = JavaVersion.VERSION_1_8
-         targetCompatibility = JavaVersion.VERSION_1_8*/
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -48,6 +46,10 @@ android {
     buildFeatures {
         buildConfig = true
         viewBinding = true
+        compose = true
+    }
+    composeOptions{
+        kotlinCompilerExtensionVersion = "1.5.3"
     }
     testOptions {
         unitTests {
@@ -92,6 +94,20 @@ dependencies {
     testImplementation("androidx.arch.core:core-testing:2.2.0")
     androidTestImplementation("androidx.arch.core:core-testing:2.2.0")
 
+    //JetPack Compose
+    implementation("androidx.activity:activity-compose:1.9.0")
+    implementation("androidx.compose.ui:ui:1.6.8")
+    implementation("androidx.compose.material:material:1.6.8")
+    implementation ("androidx.compose.ui:ui-tooling-preview:1.6.8")
+    implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.8.2")
+    implementation ("androidx.compose.material3:material3:1.2.1")
+
+    // JetPack Compose Test
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.8")
+    androidTestImplementation("androidx.compose.ui:ui-test-manifest:1.6.8")
+    androidTestImplementation("androidx.compose.ui:ui-tooling:1.6.8")
+    debugImplementation ("androidx.compose.ui:ui-tooling:1.6.8")
+
     // AndroidX Test - Core & Rules
     androidTestImplementation("androidx.test:core:1.5.0")
     androidTestImplementation("androidx.test:runner:1.5.2")
@@ -108,6 +124,7 @@ dependencies {
     implementation("com.google.dagger:hilt-android:$hilt_version")
     kaptAndroidTest("com.google.dagger:hilt-android-compiler:$hilt_version")
     implementation("androidx.hilt:hilt-work:$hilt_work")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     kapt("androidx.hilt:hilt-compiler:$hilt_work")
     kapt("com.google.dagger:hilt-compiler:$hilt_version")
     androidTestImplementation("com.google.dagger:hilt-android-testing:2.40.5@aar")

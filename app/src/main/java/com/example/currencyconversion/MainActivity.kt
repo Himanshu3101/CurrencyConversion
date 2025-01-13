@@ -199,62 +199,43 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun currencyCalculation(inputAmt: String, selectedCurrency: String) {
-        if (inputAmt.isNotEmpty() && selectedCurrency != "Selected Currency") {
-            lifecycleScope.launch(dispatcher) {
-                val baseRate =
-                    viewModel.getSelectedCurrencyRate(selectedCurrency).toString().toDouble()
 
-                val conversionResults = mutableListOf<EndResult>()
+        if (inputAmt.isEmpty() || selectedCurrency == "Selected Currency") {
+            Log.e("currencyCalculation", "Amount is null or blank or selected currency is invalid")
+            return
+        }
 
-                for (currency in listOfCurrency) {
-                    var targetRate = viewModel.getSelectedCurrencyRate(currency)
-                    var result: Double? = null
-
-                    if (targetRate == null) {
-                        var currencySplit = currency?.let { currency.split(it.last()) }
-
-                        for (splitCurrency in listOfCurrency) {
-                            var currSplitList =
-                                splitCurrency?.let { splitCurrency.split(it.last()) }
-                            if (currencySplit != null) {
-                                if (currencySplit.equals(currSplitList)) {
-                                    if (currency != splitCurrency) {
-                                        targetRate =
-                                            viewModel.getSelectedCurrencyRate(splitCurrency)
-                                        result = targetRate?.let {
-                                            convertCurrency(inputAmt.toDouble(), baseRate, it)
-                                        }
-                                        break
-                                    }
-                                } else {
-                                    Log.d(
-                                        "MainActivityLog",
-                                        "Don't have any approximate conversion using available exchange rates of related or newer versions of the currency"
-                                    )
-                                }
-                            }
-                        }
-                    } else {
-                        result = convertCurrency(inputAmt.toDouble(), baseRate, targetRate)
-                    }
-                    Log.d(
-                        "MainActivityLog",
-                        "Coversion $inputAmt $selectedCurrency is approximately $result $currency"
+        lifecycleScope.launch(dispatcher) {
+            try {
+                val baseRate = viewModel.getSelectedCurrencyRate(selectedCurrency)?.toDouble()
+                if (baseRate == null) {
+                    Log.e(
+                        "currencyCalculation",
+                        "Base rate for $selectedCurrency is null or invalid"
                     )
-                    conversionResults.add(EndResult(result, currency))
+                    return@launch
                 }
+
+                val conversionResults = withContext(dispatcher) {
+                    listOfCurrency.mapNotNull { currency ->
+                        val targetRate = viewModel.getSelectedCurrencyRate(currency)?.toDouble()
+                        val result =
+                            targetRate?.let { convertCurrency(inputAmt.toDouble(), baseRate, it) }
+                        if (result != null) EndResult(result, currency) else null
+                    }
+                }
+
                 withContext(Dispatchers.Main) {
                     resultList.clear()
                     resultList.addAll(conversionResults)
                     conversionListAdapter.notifyDataSetChanged()
-
                 }
-
+            } catch (e: Exception) {
+                Log.e("currencyCalculation", "Error in currency calculation: ${e.message}")
             }
-        } else {
-            Log.e("currencyCalculation", "Amount is null or blank")
-            return
         }
+
+
     }
 
 

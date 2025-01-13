@@ -21,11 +21,11 @@ android {
         multiDexEnabled = true
         testInstrumentationRunner = "com.example.currencyconversion.viewModels.CustomTestRunner"
 
+        //For Api Key
         val properties = Properties()
         properties.load(project.rootProject.file("local.properties").inputStream())
         buildConfigField("String", "API_KEY", properties.getProperty("API_KEY"))
     }
-
 
     buildTypes {
         release {
@@ -153,7 +153,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutine_version")
 
     // Coroutines test library
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+//    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutine_version")/*1.6.4*/
 
     //ROOM
     implementation("androidx.room:room-runtime:$roomVersion")

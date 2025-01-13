@@ -20,7 +20,7 @@ interface CurrencyDAO {
     suspend fun getRateData(currencyCode: String?): Double?
 
     @Query("SELECT currencyCode FROM currencies")
-    suspend fun getCurrencies(): List<String>
+    suspend fun     getCurrencies(): List<String>
 
     @Query("SELECT COUNT(*) FROM currencies")
     suspend fun getCurrencyCount(): Int

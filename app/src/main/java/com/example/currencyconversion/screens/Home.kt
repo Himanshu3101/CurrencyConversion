@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -38,7 +40,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.currencyconversion.models.EndResult
 import com.example.currencyconversion.viewModels.DataVModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 
 @Composable
@@ -52,11 +57,16 @@ fun Home() {
     val listOfCurrencyDb by viewModel.dBConversionCurrency.collectAsState()
 
     var selectedIndex by remember { mutableStateOf(0) }
-    var text by remember { mutableStateOf("") }
+    var inputAmt by remember { mutableStateOf("") }
+    var selectedCurr by remember { mutableStateOf("") }
 
     val currencyList = listOf("Select Currency") + listOfCurrencyDb
 
     Log.d("HomeLog", "List _ $currencyList")
+
+/*    @Inject
+    @IoDispatcher
+    lateinit var dispatcher: CoroutineDispatcher*/
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -67,12 +77,14 @@ fun Home() {
             EditTextExample(
                 listOfCurrency = currencyList,
                 selectedIndex = selectedIndex,
+                selectedCurr = selectedCurr,
                 onIndexChanged = { selectedIndex = it },
-                text = text,
-                onTextChanged = { text = it }
+                onCurrencyChanged = { selectedCurr = it },
+                inputAmt = inputAmt,
+                onTextChanged = { inputAmt = it }
             )
-            if (selectedIndex != 0) {
-                GridFrame(selectedIndex = selectedIndex, text = text)
+            if (selectedIndex != 0 && inputAmt.isNotEmpty()) {
+                GridFrame(selectedCurr, inputAmt = inputAmt, currencyList/*, dispatcher*/)
             }
         }
     }
@@ -82,14 +94,16 @@ fun Home() {
 fun EditTextExample(
     listOfCurrency: List<String?>,
     selectedIndex: Int,
+    selectedCurr: String,
     onIndexChanged: (Int) -> Unit,
-    text: String,
-    onTextChanged: (String) -> Unit)
-{
+    onCurrencyChanged: (String) -> Unit,
+    inputAmt: String,
+    onTextChanged: (String) -> Unit
+) {
     Log.d("HomeLog", "EditTextExample")
     var expanded by remember { mutableStateOf(false) }
     TextField(
-        value = text,
+        value = inputAmt,
         onValueChange = { newText ->
             onTextChanged(newText)
         },
@@ -142,6 +156,7 @@ fun EditTextExample(
                 listOfCurrency.forEachIndexed { index, item ->
                     DropdownMenuItem(onClick = {
                         onIndexChanged(index)
+                        onCurrencyChanged(listOfCurrency[index].toString())
                         expanded = false
                     }) {
                         if (item != null) {
@@ -152,24 +167,80 @@ fun EditTextExample(
             }
 
         }
-
     }
 }
 
+
 @Composable
-fun GridFrame(selectedIndex: Int, text: String) {
+fun GridFrame(
+    selectedCurr: String,
+    inputAmt: String,
+    currencyList: List<String?>,
+//    dispatcher: CoroutineDispatcher
+) {
 
     val dataVModel: DataVModel = hiltViewModel()
-    val currencyList = dataVModel.dBConversionCurrency.collectAsState()
+    var baseRate by remember { mutableStateOf<Double?>(null) }
+    var conversionResults by remember { mutableStateOf<List<EndResult>>(emptyList()) }
+
+    LaunchedEffect(selectedCurr, inputAmt) {
+
+        baseRate = dataVModel.getSelectedCurrencyRate(selectedCurr)
+        if (baseRate == null) {
+            Log.e(
+                "currencyCalculation",
+                "Base rate for $selectedCurr is null or invalid"
+            )
+        } else {
+            val results = withContext(Dispatchers.IO) {
+                currencyList.mapNotNull { currency ->
+                    val targetRate = dataVModel.getSelectedCurrencyRate(currency)?.toDouble()
+
+                    val result = targetRate?.let {
+                        baseRate?.let { baseRate ->
+                            convertCurrency(inputAmt.toDouble(), baseRate, it)
+                        }
+                    }
+                    if (result != null) {
+                        EndResult(result, currency)
+                    } else {
+                        null
+                    }.also {
+                        Log.d("HomeLog", "Result $result and Currency_$currency")
+                    }
+                }
+            }
+            conversionResults = results
+        }
+    }
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.SpaceAround
     ) {
-        items(currencyList.value){
-//            displayGrid(it)
+        items(conversionResults) { conversionResult ->
+            DisplayGrid(conversionResult)
         }
+    }
+}
+
+
+fun convertCurrency(amount: Double, sourceRate: Double, targetRate: Double): Double {
+    return (amount / sourceRate) * targetRate
+}
+
+@Composable
+fun DisplayGrid(conversionResult: EndResult) {
+    Column(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        conversionResult.currency?.let { Text(text = it, style = MaterialTheme.typography.h6) }
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(text = conversionResult.result.toString(), style = MaterialTheme.typography.body1)
     }
 }
 

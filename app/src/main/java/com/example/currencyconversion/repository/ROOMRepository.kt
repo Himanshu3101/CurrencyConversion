@@ -6,8 +6,7 @@ import com.example.currencyconversion.network.database.CurrencyDataBase
 import com.example.currencyconversion.repository.interfaces.LocalDataRepository
 import javax.inject.Inject
 
-open class ROOMRepository @Inject constructor(private val currencyDataBase: CurrencyDataBase) :
-    LocalDataRepository {
+open class ROOMRepository @Inject constructor(private val currencyDataBase: CurrencyDataBase) : LocalDataRepository {
 
     // Rates Insertion from Server
     override suspend fun insertDBExchangeData(rates: List<Rates>){
